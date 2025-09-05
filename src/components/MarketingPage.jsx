@@ -188,7 +188,7 @@ export default function MarketingPage() {
           vapiClient.stop();
         } else if (typeof vapiClient.hangup === 'function') {
           console.log('🛑 Using hangup() method');
-          vapiClient.hangup();
+        vapiClient.hangup();
         } else if (typeof vapiClient.end === 'function') {
           console.log('🛑 Using end() method');
           vapiClient.end();
@@ -202,7 +202,7 @@ export default function MarketingPage() {
           vapiRef.current.stop();
         } else if (typeof vapiRef.current.hangup === 'function') {
           console.log('🛑 Using hangup() method (ref)');
-          vapiRef.current.hangup();
+        vapiRef.current.hangup();
         } else if (typeof vapiRef.current.end === 'function') {
           console.log('🛑 Using end() method (ref)');
           vapiRef.current.end();
@@ -402,12 +402,12 @@ export default function MarketingPage() {
             </svg>
             <span>No Credit or Debit Card Required</span>
           </div>
-          
+
           {/* Voice Agent Section - Below Hero */}
           <div className="mt-80">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white">Speak to Appy Live</h2>
-            <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">Click the button below to start a live voice conversation with our AI assistant. Ask it anything about our services!</p>
-            <div className="mt-12 flex flex-col items-center gap-6">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white">Speak to Appy Live</h2>
+          <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">Click the button below to start a live voice conversation with our AI assistant. Ask it anything about our services!</p>
+          <div className="mt-12 flex flex-col items-center gap-6">
             <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 flex items-center justify-center">
               {/* Animated rings */}
               <div className="absolute inset-0 rounded-full border-2 border-blue-500/30 animate-pulse"></div>
@@ -534,22 +534,242 @@ export default function MarketingPage() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="py-20 md:py-24 text-center px-4">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white">AI Solutions Built For Your Business</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-400">Our intelligent voice agents are designed to handle key business tasks, freeing up your team.</p>
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left max-w-7xl mx-auto">
-            <div className="bg-gray-800/40 p-8 rounded-lg border border-gray-700 hover:border-blue-400 transition-all duration-300">
-              <h3 className="text-xl font-bold text-white">24/7 AI Receptionist</h3>
-              <p className="mt-2 text-gray-400">Never miss a customer call again. Our AI answers instantly, handles FAQs, and routes calls intelligently.</p>
+        {/* AI Solutions Section - Revamped with App Screenshots */}
+        <section id="features" className="py-20 md:py-24 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
+                The Complete <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">AI Business Suite</span>
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Everything you need to automate your business operations with intelligent voice AI. 
+                See your dashboard, manage calls, and configure your AI assistant - all in one powerful platform.
+              </p>
             </div>
-            <div className="bg-gray-800/40 p-8 rounded-lg border border-gray-700 hover:border-purple-400 transition-all duration-300">
-              <h3 className="text-xl font-bold text-white">Automated Appointment Booking</h3>
-              <p className="mt-2 text-gray-400">Our AI agents can schedule, reschedule, and confirm appointments directly into your calendar system.</p>
+
+            {/* App Screenshots Showcase */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+              {/* Dashboard Screenshot */}
+              <div className="bg-gray-800/40 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300">
+                <div className="bg-gray-900 rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
+                  <img 
+                    src="/screenshots/dashboard.png.png" 
+                    alt="Appify.AI Dashboard - Real-time AI agent monitoring with call metrics and voice controls"
+                    className="w-full h-auto rounded-lg"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <div className="hidden bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg p-6 text-white">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold">AI Agent Dashboard</h3>
+                      <span className="text-sm bg-white/20 px-2 py-1 rounded">Live</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white/10 rounded p-3 text-center">
+                        <div className="text-2xl font-bold">0</div>
+                        <div className="text-xs opacity-80">Total Calls</div>
+                      </div>
+                      <div className="bg-white/10 rounded p-3 text-center">
+                        <div className="text-2xl font-bold">0%</div>
+                        <div className="text-xs opacity-80">Success Rate</div>
+                      </div>
+                    </div>
+                    <div className="mt-4 text-center">
+                      <div className="w-16 h-16 bg-white/20 rounded-full mx-auto flex items-center justify-center">
+                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                      </div>
+                      <p className="text-sm mt-2">Click to start call</p>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Real-Time Dashboard</h3>
+                <p className="text-gray-400 text-sm">Monitor your AI agent's performance with live metrics, call analytics, and instant controls.</p>
+              </div>
+
+              {/* Call Logs Screenshot */}
+              <div className="bg-gray-800/40 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-all duration-300">
+                <div className="bg-gray-900 rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
+                  <img 
+                    src="/screenshots/call-logs.png.png" 
+                    alt="Appify.AI Call Logs - Detailed call analytics with success rates, duration, and cost tracking"
+                    className="w-full h-auto rounded-lg"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <div className="hidden bg-gray-800 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold text-white">Call Logs</h3>
+                      <span className="text-sm bg-purple-600 text-white px-2 py-1 rounded">100 Calls</span>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">df6c4541-2...</span>
+                        <span className="text-green-400">27s</span>
+                        <span className="text-white">$0.03</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">a8b2c9d1-4...</span>
+                        <span className="text-green-400">45s</span>
+                        <span className="text-white">$0.06</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">e7f3g8h2-1...</span>
+                        <span className="text-green-400">32s</span>
+                        <span className="text-white">$0.04</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Complete Call Analytics</h3>
+                <p className="text-gray-400 text-sm">Track every call with detailed logs, success rates, duration, and cost analysis.</p>
+              </div>
+
+              {/* Settings Screenshot */}
+              <div className="bg-gray-800/40 rounded-xl p-6 border border-gray-700 hover:border-green-500 transition-all duration-300">
+                <div className="bg-gray-900 rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
+                  <img 
+                    src="/screenshots/settings.png.png" 
+                    alt="Appify.AI Settings - AI assistant configuration with voice, model, and knowledge base settings"
+                    className="w-full h-auto rounded-lg"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <div className="hidden bg-white rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold text-gray-900">AI Assistant Settings</h3>
+                      <button className="bg-purple-600 text-white px-4 py-2 rounded text-sm">Save Settings</button>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm text-gray-600">Assistant Name</label>
+                        <input className="w-full border rounded p-2 text-sm" placeholder="My AI Assistant" />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600">Voice</label>
+                        <select className="w-full border rounded p-2 text-sm">
+                          <option>Alloy (Neutral)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600">Creativity Level: 0.7</label>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-purple-600 h-2 rounded-full" style={{width: '70%'}}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Custom AI Configuration</h3>
+                <p className="text-gray-400 text-sm">Personalize your AI agent's voice, personality, and knowledge base for your business.</p>
+              </div>
+
+              {/* Interactive Dashboard Screenshot */}
+              <div className="bg-gray-800/40 rounded-xl p-6 border border-gray-700 hover:border-yellow-500 transition-all duration-300">
+                <div className="bg-gray-900 rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
+                  <img 
+                    src="/screenshots/interactive-dashboard.png.png" 
+                    alt="Appify.AI Interactive Dashboard - Advanced analytics with real-time data visualization and interactive controls"
+                    className="w-full h-auto rounded-lg"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <div className="hidden bg-gradient-to-br from-yellow-600 to-orange-600 rounded-lg p-6 text-white">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold">Interactive Dashboard</h3>
+                      <span className="text-sm bg-white/20 px-2 py-1 rounded">Live Data</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white/10 rounded p-3 text-center">
+                        <div className="text-2xl font-bold">1,240</div>
+                        <div className="text-xs opacity-80">Total Calls</div>
+                      </div>
+                      <div className="bg-white/10 rounded p-3 text-center">
+                        <div className="text-2xl font-bold">92.5%</div>
+                        <div className="text-xs opacity-80">Success Rate</div>
+                      </div>
+                    </div>
+                    <div className="mt-4 text-center">
+                      <div className="w-16 h-16 bg-white/20 rounded-full mx-auto flex items-center justify-center">
+                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                      </div>
+                      <p className="text-sm mt-2">Interactive Analytics</p>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Interactive Analytics</h3>
+                <p className="text-gray-400 text-sm">Advanced dashboard with real-time data visualization, interactive charts, and detailed performance metrics.</p>
+              </div>
             </div>
-            <div className="bg-gray-800/40 p-8 rounded-lg border border-gray-700 hover:border-green-400 transition-all duration-300">
-              <h3 className="text-xl font-bold text-white">Intelligent Lead Qualifying</h3>
-              <p className="mt-2 text-gray-400">The AI asks screening questions to qualify leads, ensuring your sales team talks to the hottest prospects.</p>
+
+            {/* Key Benefits */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">Instant Setup</h3>
+                <p className="text-gray-400 text-sm">Get your AI agent running in minutes, not weeks</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">Real-Time Analytics</h3>
+                <p className="text-gray-400 text-sm">Track performance with detailed insights and reports</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">24/7 Availability</h3>
+                <p className="text-gray-400 text-sm">Never miss a call with round-the-clock AI coverage</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-yellow-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 00-1.066 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">Easy Customization</h3>
+                <p className="text-gray-400 text-sm">Configure voice, personality, and knowledge base in minutes</p>
+              </div>
+            </div>
+
+            {/* CTA Section */}
+            <div className="text-center mt-16">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                Ready to Transform Your Business?
+              </h3>
+              <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+                Join thousands of businesses already using Appify.AI to automate their operations and grow their revenue.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="https://app.appifyai.com" className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition transform hover:scale-105">
+                  Start Free Trial
+                </a>
+                <button onClick={() => setShowDemoModal(true)} className="px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition">
+                  Book Demo
+                </button>
+              </div>
       </div>
           </div>
       </section>
