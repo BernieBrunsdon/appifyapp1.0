@@ -1,0 +1,21 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bright white circular background for maximum visibility -->
+  <circle cx="64" cy="64" r="56" fill="white" stroke="#3B82F6" stroke-width="4"/>
+  
+  <!-- Rocket body - black with white outlines for contrast -->
+  <path d="M64 20 L72 36 L56 36 Z" fill="black" stroke="white" stroke-width="2"/>
+  <rect x="60" y="36" width="8" height="32" fill="black" stroke="white" stroke-width="2"/>
+  
+  <!-- Rocket window -->
+  <circle cx="64" cy="44" r="2" fill="white"/>
+  
+  <!-- Rocket fins -->
+  <path d="M48 68 L40 84 L48 76 Z" fill="black" stroke="white" stroke-width="2"/>
+  <path d="M80 68 L88 84 L80 76 Z" fill="black" stroke="white" stroke-width="2"/>
+  
+  <!-- Exhaust flame -->
+  <path d="M60 68 L64 88 L68 68 Z" fill="black" stroke="white" stroke-width="2"/>
+  
+  <!-- Inner white circle for extra definition -->
+  <circle cx="64" cy="64" r="48" fill="none" stroke="#3B82F6" stroke-width="2"/>
+</svg> 

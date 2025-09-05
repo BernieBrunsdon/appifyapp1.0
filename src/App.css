@@ -1,0 +1,6 @@
+/* Remove default CRA styles for logo and header */
+body, #root, .App {
+  min-height: 100vh;
+}
+
+/* You can add any custom overrides here if needed */
