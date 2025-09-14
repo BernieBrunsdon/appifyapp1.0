@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getApiUrl } from '../utils/urlHelper';
 import { FirebaseService } from '../services/firebaseService';
+import unifiedAuthService from '../utils/unifiedAuthService';
 
 const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
   const [form, setForm] = useState({
@@ -209,13 +210,12 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
         console.log('📅 Including calendar data in agent creation:', requestData.calendar);
       }
 
-      const response = await fetch(`${API_URL}/api/agents/create`, {
+      // Use unified authentication service
+      const response = await unifiedAuthService.apiRequest('/api/unified-auth/create-agent', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('demo_token')}`
-        },
-        body: JSON.stringify(requestData)
+        body: JSON.stringify({
+          agentData: requestData
+        })
       });
 
       let result;
