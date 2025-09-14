@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { CLIENT_AGENT_MAP } from './Login';
-import Vapi from '@vapi-ai/web';
+import { getAssistantManager } from '../utils/assistantManager';
+// import Vapi from '@vapi-ai/web'; // Removed static import to use dynamic import
 
-const API_URL = 'https://api.vapi.ai/assistant';
-const REST_API_KEY = '00c60c9f-62b3-4dd3-bede-036242a2b7c5';
-const PUBLIC_KEY = 'bafbc489-8d6c-474b-a23f-a735d3862720';
+const PUBLIC_KEY = '1982777e-4159-4b67-981d-4a99ae5faf31'; // Public key for mic calls - allows all assistants
 
 function getCurrentUsername() {
   const token = localStorage.getItem('demo_token');
@@ -30,8 +28,44 @@ export default function VoiceAgentSettings({ showToast }) {
   
   const token = localStorage.getItem('demo_token');
   const username = getCurrentUsername();
-  const agentId = CLIENT_AGENT_MAP[username]?.id;
   const vapiRef = useRef(null);
+  
+  // Get agent ID from localStorage (newly created agent)
+  const getAgentId = () => {
+    const storedAgentData = localStorage.getItem('agentData');
+    const storedUser = localStorage.getItem('user');
+    
+    console.log('🔍 SIMPLE AGENT ID LOOKUP:');
+    console.log('🔍 storedAgentData:', storedAgentData ? 'EXISTS' : 'NULL');
+    console.log('🔍 storedUser:', storedUser ? 'EXISTS' : 'NULL');
+    
+    if (storedAgentData) {
+      try {
+        const agentData = JSON.parse(storedAgentData);
+        console.log('🔍 Using agentData.vapiAssistantId:', agentData.vapiAssistantId);
+        return agentData.vapiAssistantId || agentData.id;
+      } catch (err) {
+        console.error('Error parsing stored agent data:', err);
+      }
+    }
+    
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        if (user.agent) {
+          console.log('🔍 Using user.agent.vapiAssistantId:', user.agent.vapiAssistantId);
+          return user.agent.vapiAssistantId || user.agent.id;
+        }
+      } catch (err) {
+        console.error('Error parsing user data:', err);
+      }
+    }
+    
+    console.log('🔍 No agent data found, using fallback');
+    return null; // No fallback needed with Firebase auth
+  };
+  
+  const agentId = getAgentId();
 
   // Load user data
   useEffect(() => {
@@ -48,59 +82,139 @@ export default function VoiceAgentSettings({ showToast }) {
       return;
     }
 
-    if (!REST_API_KEY) {
-      setError("Missing API key. Agent details can't be fetched, but calling can still work.");
+    setLoading(true);
+    
+    // Try to load agent data from localStorage first (newly created agent)
+    const storedAgentData = localStorage.getItem('agentData');
+    const storedUser = localStorage.getItem('user');
+    
+    let agentData = null;
+    if (storedAgentData) {
+      try {
+        agentData = JSON.parse(storedAgentData);
+        console.log('✅ VoiceAgentSettings loaded agent data from agentData:', agentData);
+      } catch (err) {
+        console.error('Error parsing stored agent data:', err);
+      }
+    } else if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        if (user.agent) {
+          agentData = user.agent;
+          console.log('✅ VoiceAgentSettings loaded agent data from user.agent:', agentData);
+        }
+      } catch (err) {
+        console.error('Error parsing user data:', err);
+      }
+    }
+    
+    if (agentData) {
+      setAgent(agentData);
+      setForm({
+        name: agentData.agentName || agentData.name || '',
+        greeting: agentData.firstMessage || agentData.description || '',
+        voice: agentData.agentVoice || agentData.voice || ''
+      });
       setLoading(false);
       return;
     }
 
-    setLoading(true);
-    fetch(`${API_URL}/${agentId}`, {
-      headers: { Authorization: `Bearer ${REST_API_KEY}` },
-    })
-      .then(res => {
-        if (!res.ok) throw new Error(`Failed to fetch agent. Status: ${res.status}`);
-        return res.json();
-      })
+    // Fallback to API fetch for existing agents
+    const assistantManager = getAssistantManager(username);
+    
+    assistantManager.getAssistant(agentId)
       .then(agent => {
         setAgent(agent);
         setForm({
           name: agent.name || '',
-          greeting: agent.greeting || '',
-          voice: agent.voice || ''
+          greeting: agent.firstMessage || '',
+          voice: agent.voice?.voiceId || ''
         });
         setLoading(false);
       })
       .catch(err => {
-        setError(err.message);
+        console.error('Error fetching agent:', err);
+        setError(`Failed to fetch agent: ${err.message}`);
         setLoading(false);
       });
   }, [agentId, username]);
 
   // Initialize Vapi
   useEffect(() => {
-    if (typeof Vapi !== 'undefined') {
+    const initVapi = async () => {
       try {
-        const client = new Vapi(PUBLIC_KEY);
-        client.on('call-start', () => setCallStatus('in-call'));
-        client.on('call-end', () => setCallStatus('idle'));
-        client.on('call-error', (error) => {
-          console.error('Call error:', error);
+        // Import Vapi dynamically
+        const VapiModule = await import('@vapi-ai/web');
+        const Vapi = VapiModule.default || VapiModule;
+        
+        console.log('🔧 VERSION 2.0 - Initializing Vapi with key:', PUBLIC_KEY.substring(0, 8) + '...');
+        console.log('🔧 VERSION 2.0 - Full public key:', PUBLIC_KEY);
+        
+        // Try to create client with error handling
+        let client;
+        try {
+          client = new Vapi(PUBLIC_KEY);
+          console.log('✅ VERSION 2.0 - Vapi client created successfully');
+        } catch (createError) {
+          console.error('❌ Error creating Vapi client:', createError);
+          return;
+        }
+        
+        client.on('call-start', () => {
+          console.log('📞 Call started');
+          setCallStatus('in-call');
+        });
+        client.on('call-end', () => {
+          console.log('📞 Call ended');
           setCallStatus('idle');
         });
+        client.on('call-error', (error) => {
+          console.error('📞 Call error:', error);
+          setCallStatus('idle');
+        });
+        
         vapiRef.current = client;
+        console.log('✅ VERSION 2.0 - Vapi client initialized successfully');
+        
+        // Test if we can access the assistant
+        console.log('🧪 Testing Vapi client methods:', Object.getOwnPropertyNames(client));
+        console.log('🧪 Vapi client start method:', typeof client.start);
+        
+        // Vapi client is ready for real calls
+        console.log('🧪 VERSION 2.0 - Vapi client ready for calls');
       } catch (error) {
-        console.error('Error initializing Vapi:', error);
+        console.error('❌ Error initializing Vapi:', error);
       }
-    }
+    };
+    
+    initVapi();
   }, []);
 
   const startCall = () => {
     if (callStatus !== 'idle' || !vapiRef.current) return;
-    
+
+    if (!agentId) {
+      showToast('No assistant ID found. Please create an assistant first.');
+      return;
+    }
+
     setCallStatus('starting');
     try {
+      console.log('🎤 VERSION 2.0 - Starting call with assistant ID:', agentId);
+      console.log('🎤 VERSION 2.0 - Assistant ID type:', typeof agentId);
+      console.log('🎤 VERSION 2.0 - Assistant ID length:', agentId.length);
+      console.log('🎤 VERSION 2.0 - Using API key:', PUBLIC_KEY.substring(0, 8) + '...');
+      console.log('🎤 VERSION 2.0 - Full API key:', PUBLIC_KEY);
+      console.log('🎤 VERSION 2.0 - Vapi client initialized:', !!vapiRef.current);
+      console.log('🎤 VERSION 2.0 - Vapi client type:', typeof vapiRef.current);
+      
+      // Test if the assistant ID is a valid UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      console.log('🎤 Assistant ID is valid UUID:', uuidRegex.test(agentId));
+      
+      console.log('🎤 About to call vapiRef.current.start with:', agentId);
       vapiRef.current.start(agentId);
+      console.log('🎤 vapiRef.current.start called successfully');
     } catch (error) {
       console.error('Error starting call:', error);
       setCallStatus('idle');
@@ -145,11 +259,30 @@ export default function VoiceAgentSettings({ showToast }) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      showToast('Settings saved successfully!');
+      const assistantManager = getAssistantManager(username);
+      
+      const settings = {
+        assistantName: form.name,
+        firstMessage: form.greeting,
+        voice: form.voice,
+        model: 'gpt-4o',
+        temperature: 0.7,
+        knowledgeBase: form.greeting // Using greeting as knowledge base for now
+      };
+
+      if (agentId) {
+        // Update existing assistant
+        await assistantManager.updateAssistant(agentId, settings);
+        showToast('Settings updated successfully!');
+      } else {
+        // Create new assistant
+        const newAssistant = await assistantManager.createAssistant(settings);
+        setAgent(newAssistant);
+        showToast('Assistant created successfully!');
+      }
     } catch (error) {
-      showToast('Failed to save settings. Please try again.');
+      console.error('Error saving settings:', error);
+      showToast(`Failed to save settings: ${error.message}`);
     } finally {
       setSaving(false);
     }
@@ -158,7 +291,14 @@ export default function VoiceAgentSettings({ showToast }) {
   const handleLogout = () => {
     localStorage.removeItem('demo_token');
     localStorage.removeItem('user');
+    localStorage.removeItem('agentData');
     window.location.href = '/';
+  };
+
+  const handleClearAgentData = () => {
+    localStorage.removeItem('agentData');
+    localStorage.removeItem('user');
+    window.location.reload();
   };
 
   if (loading) {
@@ -210,8 +350,23 @@ export default function VoiceAgentSettings({ showToast }) {
         <main className="px-4 md:px-8 pb-8">
           {/* Welcome Section */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">AI Agent Dashboard</h1>
-            <p className="text-gray-400 text-lg">Manage your voice AI agent and monitor performance</p>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              {agent ? `${agent.name} Dashboard` : 'AI Agent Dashboard'}
+            </h1>
+            <p className="text-gray-400 text-lg">
+              {agent ? `Manage ${agent.name} and monitor performance` : 'Manage your voice AI agent and monitor performance'}
+            </p>
+            {agent && (
+              <div className="mt-4 flex items-center space-x-6 text-sm text-gray-300">
+                <span>Voice: {agent.voice}</span>
+                <span>•</span>
+                <span>Phone: {agent.phoneNumber}</span>
+                <span>•</span>
+                <span>Region: {agent.region?.toUpperCase()}</span>
+                <span>•</span>
+                <span>Assistant ID: {agent.id?.substring(0, 8)}...</span>
+              </div>
+            )}
           </div>
 
           {/* Stats Cards */}
@@ -334,6 +489,53 @@ export default function VoiceAgentSettings({ showToast }) {
               </div>
             )}
 
+            {/* Clear Agent Data Button */}
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-yellow-300 font-semibold mb-1">⚠️ Invalid Assistant ID Detected</h4>
+                  <p className="text-yellow-200 text-sm">
+                    The current assistant ID ({agentId}) is not valid in Vapi. This usually happens when the assistant creation failed.
+                  </p>
+                </div>
+                <button
+                  onClick={handleClearAgentData}
+                  className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
+                >
+                  Clear & Recreate
+                </button>
+              </div>
+            </div>
+
+            {/* Agent Info Display */}
+            {agent && (
+              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 mb-6">
+                <h3 className="text-green-300 font-semibold mb-3">✅ Agent Successfully Created</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-green-200">Name:</span>
+                    <span className="text-white ml-2">{agent.name}</span>
+                  </div>
+                  <div>
+                    <span className="text-green-200">Voice:</span>
+                    <span className="text-white ml-2">{agent.voice}</span>
+                  </div>
+                  <div>
+                    <span className="text-green-200">Phone Number:</span>
+                    <span className="text-white ml-2">{agent.phoneNumber}</span>
+                  </div>
+                  <div>
+                    <span className="text-green-200">Region:</span>
+                    <span className="text-white ml-2">{agent.region?.toUpperCase()}</span>
+                  </div>
+                  <div className="md:col-span-2">
+                    <span className="text-green-200">Assistant ID:</span>
+                    <span className="text-white ml-2 font-mono text-xs">{agent.id}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Agent Name</label>
@@ -365,13 +567,13 @@ export default function VoiceAgentSettings({ showToast }) {
             </div>
 
             <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-300 mb-2">Greeting Message</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
               <textarea
                 value={form.greeting}
                 onChange={(e) => setForm({...form, greeting: e.target.value})}
                 rows="4"
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Hello! This is your AI assistant. How can I help you today?"
+                placeholder="Describe what your AI agent should do..."
               />
             </div>
 

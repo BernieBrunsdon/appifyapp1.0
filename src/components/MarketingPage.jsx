@@ -1,17 +1,51 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { getAppUrl } from '../utils/urlHelper';
 import Vapi from '@vapi-ai/web';
 import DemoBookingModal from './DemoBookingModal';
 
+// FAQ Item Component
+const FAQItem = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="card overflow-hidden">
+      <button
+        className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-800/50 transition-colors"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="text-text-primary font-medium">{question}</span>
+        <svg
+          className={`w-5 h-5 text-green-400 transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div className="px-6 pb-4">
+          <div className="border-t border-border-gray pt-4">
+            <p className="text-text-secondary leading-relaxed">{answer}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Vapi Configuration
-const VAPI_PUBLIC_KEY = 'bafbc489-8d6c-474b-a23f-a735d3862720';
-const VAPI_ASSISTANT_ID = 'acb59b5f-4648-4d63-b5bf-2595998b532a';
+const VAPI_PUBLIC_KEY = '1982777e-4159-4b67-981d-4a99ae5faf31'; // Updated public key with all assistants permission
+const VAPI_ASSISTANT_ID = '7b950f50-7a8b-4371-a508-acb2d4dd5c7c'; // Use the working dylan assistant ID
 const REST_API_KEY = '00c60c9f-62b3-4dd3-bede-036242a2b7c5';
 
 const tiers = [
   {
-    name: 'Basic Plan',
-    price: '$249/mo',
-    setupCost: '$99',
+    name: 'Free Plan',
+    price: 'Free',
+    setupCost: 'Free',
     features: [
       'Intelligent AI human-like call answering',
       'Full access to APPY (Appify App)',
@@ -22,13 +56,13 @@ const tiers = [
       'Knowledge base',
       '1 business phone number (or bring your own)',
       'Call filtering to divert unwanted calls to email',
-      '500 minutes included',
+      '100 minutes included',
       'Overage: $0.25/minute'
     ],
     idealFor: 'Local shops, solo practitioners, or small offices',
     setupTime: '2-3 business days',
-    paypalAmount: '249.00',
-    paypalItem: 'AppifyAI Basic Plan',
+    paypalAmount: '0.00',
+    paypalItem: 'AppifyAI Free Plan',
   },
   {
     name: 'Pro Plan',
@@ -333,70 +367,39 @@ export default function MarketingPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Beautiful Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
-      <div className="absolute inset-0 bg-gradient-to-tr from-pink-900/20 via-purple-900/20 to-blue-900/20"></div>
-      
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
-      </div>
-      
-      {/* Background Grid */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: `
-          linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
-        `,
-        backgroundSize: '40px 40px',
-        backgroundPosition: 'center center'
-      }}></div>
-
+    <div className="min-h-screen relative overflow-hidden gradient-bg-professional">
       <div className="relative z-10">
         {/* Navigation Bar */}
         <header className="absolute top-0 left-0 right-0 z-20 flex justify-between items-center py-6 px-4 md:px-8">
-          <div className="text-3xl font-bold text-white">
+          <div className="text-3xl font-bold text-text-primary font-inter">
             Appify.AI
           </div>
           <nav className="flex items-center space-x-6">
-            <a href="#features" className="text-gray-300 hover:text-white transition">Features</a>
-            <a href="#pricing" className="text-gray-300 hover:text-white transition">Pricing</a>
-            <a href="#contact" className="text-gray-300 hover:text-white transition">Contact</a>
-            <a href="https://app.appifyai.com" className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg text-white hover:from-purple-700 hover:to-blue-700 transition font-semibold">
+            <a href="#features" className="text-text-secondary hover:text-text-primary transition-colors duration-300">Features</a>
+            <a href="#pricing" className="text-text-secondary hover:text-text-primary transition-colors duration-300">Pricing</a>
+            <a href="#contact" className="text-text-secondary hover:text-text-primary transition-colors duration-300">Contact</a>
+            <a href={getAppUrl("/register")} className="btn-ghost">
               Get Started
             </a>
-            {/* Development Mode Toggle */}
-            {window.location.hostname === 'localhost' && (
-              <a 
-                href="?app=true" 
-                className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-white text-sm font-semibold transition"
-                title="Switch to App View (Development Mode)"
-              >
-                🛠 App View
-              </a>
-            )}
           </nav>
         </header>
 
         {/* Hero Section */}
         <main className="pt-48 pb-16 md:pt-56 md:pb-24 text-center px-4">
-          <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight">
+          <h1 className="text-5xl md:text-7xl heading-primary leading-tight">
             Automate Your Business with <br /> 
-            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-accent-blue to-blue-400 bg-clip-text text-transparent">
               Intelligent Voice AI
             </span>
           </h1>
-          <p className="mt-8 max-w-3xl mx-auto text-xl text-gray-300">
+          <p className="mt-8 max-w-3xl mx-auto text-xl text-text-secondary">
             We build custom voice AI agents to answer calls, book appointments, and qualify leads, so you can focus on growing your business.
           </p>
           <div className="mt-12 flex flex-col sm:flex-row justify-center items-center gap-6">
-            <a href="https://app.appifyai.com" className="w-full sm:w-auto px-10 py-5 text-lg font-semibold text-white rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition transform hover:scale-105">Start Free Trial</a>
-            <button onClick={() => setShowDemoModal(true)} className="w-full sm:w-auto px-10 py-5 text-lg font-semibold text-white rounded-lg border-2 border-white/30 hover:bg-white/10 transition transform hover:scale-105">Book A Demo</button>
+            <a href="https://app.appifyai.com/register" className="btn-primary text-lg px-10 py-5 w-full sm:w-auto">Start Free Trial</a>
+            <button onClick={() => setShowDemoModal(true)} className="btn-secondary text-lg px-10 py-5 w-full sm:w-auto">Book A Demo</button>
           </div>
-          <div className="mt-8 flex justify-center items-center space-x-2 text-gray-300 text-base">
+          <div className="mt-8 flex justify-center items-center space-x-2 text-text-secondary text-base">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-400" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
@@ -405,13 +408,13 @@ export default function MarketingPage() {
 
           {/* Voice Agent Section - Below Hero */}
           <div className="mt-80">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white">Speak to Appy Live</h2>
-          <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">Click the button below to start a live voice conversation with our AI assistant. Ask it anything about our services!</p>
+          <h2 className="text-3xl md:text-4xl heading-primary">Speak to Appy Live</h2>
+          <p className="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">Click the button below to start a live voice conversation with our AI assistant. Ask it anything about our services!</p>
           <div className="mt-12 flex flex-col items-center gap-6">
-            <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+            <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-accent-blue/20 to-blue-400/20 flex items-center justify-center">
               {/* Animated rings */}
-              <div className="absolute inset-0 rounded-full border-2 border-blue-500/30 animate-pulse"></div>
-              <div className="absolute inset-0 rounded-full border-2 border-purple-500/30 animate-pulse" style={{animationDelay: '1s'}}></div>
+              <div className="absolute inset-0 rounded-full border-2 border-accent-blue/30 animate-pulse"></div>
+              <div className="absolute inset-0 rounded-full border-2 border-blue-400/30 animate-pulse" style={{animationDelay: '1s'}}></div>
               <div className="absolute inset-0 rounded-full border-2 border-green-500/30 animate-pulse" style={{animationDelay: '2s'}}></div>
               
               {/* Main button */}
@@ -423,7 +426,7 @@ export default function MarketingPage() {
                     ? 'bg-red-500/80 border-2 border-red-400 hover:bg-red-600/80 animate-pulse' 
                     : callStatus === 'starting'
                     ? 'bg-yellow-500/80 border-2 border-yellow-400 animate-pulse'
-                    : 'bg-gray-800/60 border-2 border-gray-600 hover:border-purple-500 hover:scale-105'
+                    : 'bg-secondary-bg border-2 border-border-gray hover:border-accent-blue hover:scale-105'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {callStatus === 'in-call' ? (
@@ -474,51 +477,51 @@ export default function MarketingPage() {
         {/* AI Agent Chat Section */}
         <section id="ai-agent" className="py-10 md:py-16 px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white">...Or Type to our AI Assistant</h2>
-            <p className="mt-4 text-lg text-gray-400">Have questions about our Voice AI solutions, features, or pricing? Appify's AI agent is here to help you 24/7.</p>
+            <h2 className="text-3xl md:text-4xl heading-primary">...Or Type to our AI Assistant</h2>
+            <p className="mt-4 text-lg text-text-secondary">Have questions about our Voice AI solutions, features, or pricing? Appify's AI agent is here to help you 24/7.</p>
           </div>
           <div className="mt-12 max-w-2xl mx-auto">
-            <div className="bg-gray-800/40 border border-gray-700 rounded-lg shadow-2xl flex flex-col h-96">
+            <div className="card shadow-2xl flex flex-col h-96">
               <div className="p-6 flex-grow overflow-y-auto space-y-4">
                 {chatMessages.map((msg) => (
                   <div key={msg.id} className={`flex items-start gap-3 ${msg.isAI ? 'justify-start' : 'justify-end'}`}>
                     {msg.isAI && (
-                      <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-sm font-bold text-white">AI</div>
+                      <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-to-r from-accent-blue to-blue-400 flex items-center justify-center text-sm font-bold text-white">AI</div>
                     )}
-                    <div className={`max-w-xs px-4 py-2 rounded-lg ${msg.isAI ? 'bg-gray-700 text-gray-200' : 'bg-blue-600 text-white'}`}>
+                    <div className={`max-w-xs px-4 py-2 rounded-lg ${msg.isAI ? 'bg-secondary-bg text-text-primary' : 'bg-accent-blue text-white'}`}>
                       <p className="text-sm">{msg.text}</p>
                     </div>
                     {!msg.isAI && (
-                      <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center text-sm font-bold text-white">U</div>
+                      <div className="flex-shrink-0 h-8 w-8 rounded-full bg-border-gray flex items-center justify-center text-sm font-bold text-white">U</div>
                     )}
                   </div>
                 ))}
                 {chatLoading && (
                   <div className="flex items-start gap-3 justify-start">
-                    <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-sm font-bold text-white">AI</div>
-                    <div className="bg-gray-700 text-gray-200 px-4 py-2 rounded-lg">
+                    <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-to-r from-accent-blue to-blue-400 flex items-center justify-center text-sm font-bold text-white">AI</div>
+                    <div className="bg-secondary-bg text-text-primary px-4 py-2 rounded-lg">
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        <div className="w-2 h-2 bg-text-secondary rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-text-secondary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-2 h-2 bg-text-secondary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                       </div>
                     </div>
                   </div>
                 )}
               </div>
-              <form onSubmit={handleChatSubmit} className="p-4 border-t border-gray-700 flex items-center gap-2">
+              <form onSubmit={handleChatSubmit} className="p-4 border-t border-border-gray flex items-center gap-2">
                 <input 
                   type="text" 
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   disabled={chatLoading}
-                  className="flex-grow bg-gray-700 border-gray-600 rounded-md py-2 px-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed" 
+                  className="input-field flex-grow" 
                   placeholder={chatLoading ? "AI is thinking..." : "Type your question..."}
                 />
                 <button 
                   type="submit" 
                   disabled={chatLoading || !chatInput.trim()}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {chatLoading ? (
                     <>
@@ -538,10 +541,10 @@ export default function MarketingPage() {
         <section id="features" className="py-20 md:py-24 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
-                The Complete <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">AI Business Suite</span>
+              <h2 className="text-4xl md:text-5xl heading-primary mb-6">
+                The Complete <span className="bg-gradient-to-r from-accent-blue to-blue-400 bg-clip-text text-transparent">AI Business Suite</span>
               </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              <p className="text-xl text-text-secondary max-w-3xl mx-auto">
                 Everything you need to automate your business operations with intelligent voice AI. 
                 See your dashboard, manage calls, and configure your AI assistant - all in one powerful platform.
               </p>
@@ -550,8 +553,8 @@ export default function MarketingPage() {
             {/* App Screenshots Showcase */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
               {/* Dashboard Screenshot */}
-              <div className="bg-gray-800/40 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all duration-300">
-                <div className="bg-gray-900 rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
+              <div className="card hover:border-accent-blue transition-all duration-300">
+                <div className="bg-primary-bg rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
                   <img 
                     src="/screenshots/dashboard.png.png" 
                     alt="Appify.AI Dashboard - Real-time AI agent monitoring with call metrics and voice controls"
@@ -591,8 +594,8 @@ export default function MarketingPage() {
               </div>
 
               {/* Call Logs Screenshot */}
-              <div className="bg-gray-800/40 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-all duration-300">
-                <div className="bg-gray-900 rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
+              <div className="card hover:border-accent-blue transition-all duration-300">
+                <div className="bg-primary-bg rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
                   <img 
                     src="/screenshots/call-logs.png.png" 
                     alt="Appify.AI Call Logs - Detailed call analytics with success rates, duration, and cost tracking"
@@ -626,13 +629,13 @@ export default function MarketingPage() {
                     </div>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Complete Call Analytics</h3>
-                <p className="text-gray-400 text-sm">Track every call with detailed logs, success rates, duration, and cost analysis.</p>
+                <h3 className="text-xl font-bold text-text-primary mb-2">Complete Call Analytics</h3>
+                <p className="text-text-secondary text-sm">Track every call with detailed logs, success rates, duration, and cost analysis.</p>
               </div>
 
               {/* Settings Screenshot */}
-              <div className="bg-gray-800/40 rounded-xl p-6 border border-gray-700 hover:border-green-500 transition-all duration-300">
-                <div className="bg-gray-900 rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
+              <div className="card hover:border-green-500 transition-all duration-300">
+                <div className="bg-primary-bg rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
                   <img 
                     src="/screenshots/settings.png.png" 
                     alt="Appify.AI Settings - AI assistant configuration with voice, model, and knowledge base settings"
@@ -667,13 +670,13 @@ export default function MarketingPage() {
                     </div>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Custom AI Configuration</h3>
-                <p className="text-gray-400 text-sm">Personalize your AI agent's voice, personality, and knowledge base for your business.</p>
+                <h3 className="text-xl font-bold text-text-primary mb-2">Custom AI Configuration</h3>
+                <p className="text-text-secondary text-sm">Personalize your AI agent's voice, personality, and knowledge base for your business.</p>
               </div>
 
               {/* Interactive Dashboard Screenshot */}
-              <div className="bg-gray-800/40 rounded-xl p-6 border border-gray-700 hover:border-yellow-500 transition-all duration-300">
-                <div className="bg-gray-900 rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
+              <div className="card hover:border-yellow-500 transition-all duration-300">
+                <div className="bg-primary-bg rounded-lg p-4 mb-4 shadow-2xl overflow-hidden">
                   <img 
                     src="/screenshots/interactive-dashboard.png.png" 
                     alt="Appify.AI Interactive Dashboard - Advanced analytics with real-time data visualization and interactive controls"
@@ -756,17 +759,17 @@ export default function MarketingPage() {
 
             {/* CTA Section */}
             <div className="text-center mt-16">
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              <h3 className="text-2xl md:text-3xl heading-primary mb-4">
                 Ready to Transform Your Business?
               </h3>
-              <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+              <p className="text-lg text-text-secondary mb-8 max-w-2xl mx-auto">
                 Join thousands of businesses already using Appify.AI to automate their operations and grow their revenue.
               </p>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href="https://app.appifyai.com" className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition transform hover:scale-105">
+                <a href="https://app.appifyai.com/register" className="btn-primary px-8 py-4">
                   Start Free Trial
                 </a>
-                <button onClick={() => setShowDemoModal(true)} className="px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition">
+                <button onClick={() => setShowDemoModal(true)} className="btn-secondary px-8 py-4">
                   Book Demo
                 </button>
               </div>
@@ -774,43 +777,58 @@ export default function MarketingPage() {
           </div>
       </section>
 
-        {/* Reviews Section */}
-        <section id="reviews" className="py-20 md:py-24 px-4">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white text-center">Loved by Teams Worldwide</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-400 text-center">Don't just take our word for it. Here's what our customers have to say.</p>
-          <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            <div className="bg-gray-800/40 p-8 rounded-lg border border-gray-700">
-              <p className="text-gray-300">"Appify.AI's voice agent has been a game-changer. We're capturing leads 24/7."</p>
-              <div className="flex items-center mt-6">
-                <p className="font-semibold text-white">Dr. Jane Smith</p>
-              </div>
+
+
+        {/* FAQ Section */}
+        <section className="py-20 md:py-24 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <span className="text-green-400 text-sm font-semibold">FAQs</span>
+              <h2 className="text-3xl md:text-4xl heading-primary mt-2">Frequently Asked Questions</h2>
             </div>
-            <div className="bg-gray-800/40 p-8 rounded-lg border border-gray-700">
-              <p className="text-gray-300">"As a law firm, every call is critical. We used to miss calls after hours. Not anymore."</p>
-              <div className="flex items-center mt-6">
-                <p className="font-semibold text-white">Michael Doe</p>
-              </div>
+            
+            <div className="space-y-4">
+              <FAQItem 
+                question="How long does it take to get started?"
+                answer="Most businesses can get their AI voice agent up and running within 2-3 business days. Our Basic plan includes quick setup, while Pro and Premium plans offer priority setup in 1-2 days."
+              />
+              <FAQItem 
+                question="Is there customer support available?"
+                answer="Yes! We provide comprehensive support for all plans. Basic includes email support, Pro includes priority support, and Premium includes dedicated account management and premium support."
+              />
+              <FAQItem 
+                question="How much does your platform cost?"
+                answer="Our pricing starts at $249/month for the Basic plan, $499/month for Pro, and $999+/month for Premium/Enterprise. All plans include setup costs and come with included minutes."
+              />
+              <FAQItem 
+                question="Is my data secure on your platform?"
+                answer="Absolutely. We use enterprise-grade security with end-to-end encryption, SOC 2 compliance, and regular security audits. Your data is never shared with third parties without your explicit consent."
+              />
+              <FAQItem 
+                question="How does Appify.AI compare to other tools?"
+                answer="Appify.AI offers the most comprehensive voice AI solution with real-time analytics, custom AI workflows, and seamless integrations. Unlike basic chatbots, our AI can handle complex conversations, book appointments, and qualify leads just like a human receptionist."
+              />
             </div>
           </div>
         </section>
 
         {/* Pricing Section */}
         <section id="pricing" className="py-20 md:py-24 text-center px-4">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white">Choose the Right Plan for You</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-400">Simple, transparent pricing that scales with your needs.</p>
+          <h2 className="text-3xl md:text-4xl heading-primary">Choose the Right Plan for You</h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-text-secondary">Simple, transparent pricing that scales with your needs.</p>
           <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto text-left">
             {tiers.map((tier, index) => (
-              <div key={tier.name} className={`bg-gray-800/40 p-8 rounded-lg border flex flex-col ${index === 1 ? 'border-2 border-purple-500 relative' : 'border-gray-700'}`}>
+              <div key={tier.name} className={`card p-8 flex flex-col ${index === 1 ? 'border-2 border-accent-blue relative' : ''}`}>
                 {index === 1 && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Most Popular</span>
+                    <span className="bg-accent-blue text-white px-3 py-1 rounded-full text-sm font-semibold">Most Popular</span>
                   </div>
                 )}
-                <h3 className="text-2xl font-bold text-white">{tier.name}</h3>
-                <p className="mt-4 text-4xl font-extrabold text-white">{tier.price}</p>
-                <p className="text-sm text-gray-400">Setup: {tier.setupCost}</p>
-                <p className="text-sm text-gray-400 mb-6">{tier.setupTime}</p>
-                <ul className="space-y-3 text-gray-300 flex-grow">
+                <h3 className="text-2xl font-bold text-text-primary">{tier.name}</h3>
+                <p className="mt-4 text-4xl font-extrabold text-text-primary">{tier.price}</p>
+                <p className="text-sm text-text-secondary">Setup: {tier.setupCost}</p>
+                <p className="text-sm text-text-secondary mb-6">{tier.setupTime}</p>
+                <ul className="space-y-3 text-text-secondary flex-grow">
                   {tier.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start">
                       <span className="text-green-400 mr-3 mt-1">✓</span>
@@ -818,22 +836,20 @@ export default function MarketingPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-8 bg-gray-700/30 p-4 rounded-md">
-                  <p className="font-semibold text-white flex items-center">
+                <div className="mt-8 bg-secondary-bg p-4 rounded-md">
+                  <p className="font-semibold text-text-primary flex items-center">
                     <svg className="h-5 w-5 text-green-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
                     Ideal for:
                   </p>
-                  <p className="text-gray-400 text-sm mt-1">{tier.idealFor}</p>
+                  <p className="text-text-secondary text-sm mt-1">{tier.idealFor}</p>
                 </div>
                 <a 
-                  href={`https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=herschelgomez@xyzzyu.com&item_name=${tier.paypalItem}&amount=${tier.paypalAmount}&currency_code=USD`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="mt-8 w-full block text-center px-6 py-3 font-semibold text-black rounded-lg bg-yellow-400 hover:bg-yellow-500 transition"
+                  href={`${getAppUrl("/register")}?plan=${tier.name.toLowerCase().replace(' plan', '').replace(' ', '_')}`}
+                  className="mt-8 w-full block text-center btn-primary"
                 >
-                  Buy Now
+                  {tier.name === 'Free Plan' ? 'Start Free' : 'Get Started'}
                 </a>
               </div>
             ))}
@@ -843,8 +859,8 @@ export default function MarketingPage() {
         {/* Contact Section */}
         <section id="contact" className="py-20 md:py-24 px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white">Ready to Get Started?</h2>
-            <p className="mt-4 text-lg text-gray-400">Book a demo or drop us a line. We'd love to hear from you.</p>
+            <h2 className="text-3xl md:text-4xl heading-primary">Ready to Get Started?</h2>
+            <p className="mt-4 text-lg text-text-secondary">Book a demo or drop us a line. We'd love to hear from you.</p>
           </div>
           <div className="mt-12 max-w-xl mx-auto">
             <form onSubmit={handleContactSubmit} className="space-y-6">
@@ -853,25 +869,25 @@ export default function MarketingPage() {
                 placeholder="Your Name" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="block w-full bg-gray-800/60 border border-gray-600 rounded-md py-3 px-4 text-white placeholder-gray-400"
+                className="input-field w-full"
               />
               <input 
                 type="email" 
                 placeholder="Your Email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full bg-gray-800/60 border border-gray-600 rounded-md py-3 px-4 text-white placeholder-gray-400"
+                className="input-field w-full"
               />
               <textarea 
                 rows="4" 
                 placeholder="Describe your business..." 
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="block w-full bg-gray-800/60 border border-gray-600 rounded-md py-3 px-4 text-white placeholder-gray-400"
+                className="input-field w-full"
               ></textarea>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button type="submit" className="w-full sm:w-1/2 px-8 py-4 font-semibold text-white rounded-lg border border-gray-600 hover:bg-gray-800 transition">Send Message</button>
-                <button type="button" onClick={() => setShowDemoModal(true)} className="w-full sm:w-1/2 px-8 py-4 font-semibold text-white rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 transition">Book a Demo</button>
+                <button type="submit" className="btn-secondary w-full sm:w-1/2">Send Message</button>
+                <button type="button" onClick={() => setShowDemoModal(true)} className="btn-primary w-full sm:w-1/2">Book a Demo</button>
           </div>
             {submitted && (
                 <p className="text-green-400 text-sm">Opening your email client… If it didn't open, click "Book a Demo".</p>
@@ -880,10 +896,134 @@ export default function MarketingPage() {
           </div>
       </section>
 
-        {/* Footer */}
-        <footer className="border-t border-gray-800 py-8">
-          <div className="container mx-auto px-4 md:px-8">
-            <p className="text-center text-gray-400">&copy; 2025 Appify.AI. All rights reserved.</p>
+        {/* Enhanced Footer */}
+        <footer className="bg-secondary-bg border-t border-border-gray py-16">
+          <div className="max-w-7xl mx-auto px-4 md:px-8">
+            {/* Main Footer Content */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              {/* Company Info */}
+              <div className="lg:col-span-2">
+                <div className="flex items-center mb-6">
+                  <div className="text-3xl font-bold text-text-primary">Appify.AI</div>
+                </div>
+                <p className="text-text-secondary text-lg leading-relaxed mb-6 max-w-md">
+                  The future of business communication is here. Our intelligent AI receptionist never sleeps, 
+                  answering calls, booking appointments, and handling customer inquiries 24/7.
+                </p>
+                <div className="flex space-x-4">
+                  <a href="https://app.appifyai.com/register" className="btn-primary">
+                    Start Free Trial
+                  </a>
+                  <button onClick={() => setShowDemoModal(true)} className="btn-secondary">
+                    Book Demo
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Links */}
+              <div>
+                <h3 className="text-xl font-semibold text-text-primary mb-6">Quick Links</h3>
+                <div className="space-y-4">
+                  <a href="#features" className="block text-text-secondary hover:text-text-primary transition hover:translate-x-1">Features</a>
+                  <a href="#pricing" className="block text-text-secondary hover:text-text-primary transition hover:translate-x-1">Pricing</a>
+                  <a href="#contact" className="block text-text-secondary hover:text-text-primary transition hover:translate-x-1">Contact</a>
+                  <a href="https://app.appifyai.com/register" className="block text-text-secondary hover:text-text-primary transition hover:translate-x-1">Get Started</a>
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div>
+                <h3 className="text-xl font-semibold text-text-primary mb-6">Contact Us</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-5 h-5 text-accent-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <a href="mailto:admin@appifyai.com" className="text-text-secondary hover:text-text-primary transition">
+                      admin@appifyai.com
+                    </a>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-5 h-5 text-accent-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <a href="tel:+15419070061" className="text-gray-300 hover:text-white transition">
+                      +1 (541) 907 0061
+                    </a>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-5 h-5 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <a href="https://wa.me/14155238886" className="text-gray-300 hover:text-white transition">
+                      WhatsApp: +1 (415) 523 8886
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Features Highlight */}
+            <div className="bg-gray-800/30 rounded-xl p-8 mb-12">
+              <h3 className="text-2xl font-bold text-white text-center mb-8">Why Choose Appify.AI?</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-lg font-semibold text-white mb-2">Lightning Fast Setup</h4>
+                  <p className="text-gray-300 text-sm">Get your AI agent running in minutes, not weeks</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-lg font-semibold text-white mb-2">24/7 Availability</h4>
+                  <p className="text-gray-300 text-sm">Never miss a call with round-the-clock AI coverage</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-lg font-semibold text-white mb-2">Real-Time Analytics</h4>
+                  <p className="text-gray-300 text-sm">Track performance with detailed insights and reports</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Bottom Footer */}
+            <div className="border-t border-gray-700 pt-8">
+              <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p className="text-gray-400 text-center md:text-left">
+                  &copy; 2025 Appify.AI. All rights reserved. | 
+                  <a href="#" className="hover:text-white transition ml-1">Privacy Policy</a> | 
+                  <a href="#" className="hover:text-white transition ml-1">Terms of Service</a>
+                </p>
+                <div className="flex space-x-6">
+                  <a href="#" className="text-gray-400 hover:text-white transition">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                    </svg>
+                  </a>
+                  <a href="#" className="text-gray-400 hover:text-white transition">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                    </svg>
+                  </a>
+                  <a href="#" className="text-gray-400 hover:text-white transition">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </footer>
       </div>

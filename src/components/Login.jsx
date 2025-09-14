@@ -1,63 +1,80 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-// Demo client map with passwords
-export const CLIENT_AGENT_MAP = {
-  neil: { id: 'acb59b5f-4648-4d63-b5bf-2595998b532a', password: 'neilpass' },   // Uses your correct agent
-  bernie: { id: 'acb59b5f-4648-4d63-b5bf-2595998b532a', password: 'berniepass' } // Uses your correct agent
-};
+import { signInUser, signOutUser } from '../firebase/auth';
+import { FirebaseService } from '../services/firebaseService';
 
 export default function Login({ onLogin }) {
-  const [form, setForm] = useState({ username: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
-  const [debug, setDebug] = useState('');
-  const [tokenDebug, setTokenDebug] = useState('');
-  const [currentToken, setCurrentToken] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setCurrentToken(localStorage.getItem('demo_token'));
-  });
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setDebug('');
+    setLoading(true);
 
-    const { username, password } = form;
-    const client = CLIENT_AGENT_MAP[username.toLowerCase()];
+    try {
+      const result = await signInUser(form.email, form.password);
+      
+      if (result.success) {
+        console.log('🔍 Login successful, loading agent data...');
+        
+        // Load agent data from Firestore
+        let agentData = null;
+        try {
+          const agents = await FirebaseService.getClientAgents(result.user.uid);
+          if (agents && agents.length > 0) {
+            agentData = agents[0]; // Get the most recent agent
+            console.log('✅ Agent data loaded from Firestore:', agentData);
+            
+            // Save agent data to localStorage
+            localStorage.setItem('agentData', JSON.stringify(agentData));
+          } else {
+            console.log('⚠️ No agent data found for user');
+          }
+        } catch (agentError) {
+          console.error('❌ Error loading agent data:', agentError);
+          // Continue with login even if agent loading fails
+        }
+        
+        // Store user data in localStorage
+        const userData = {
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName,
+          ...result.userData,
+          agent: agentData // Include agent data in user object
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userData));
+        console.log('✅ User data saved to localStorage:', userData);
+        
+        // Call the onLogin callback if provided
+        if (onLogin) {
+          onLogin(result.user, userData);
+        }
 
-    if (!client) {
-      setError(`User '${username}' not found. Available users: ${Object.keys(CLIENT_AGENT_MAP).join(', ')}`);
-      return;
+        // Navigate to the dashboard
+        navigate('/dashboard');
+      } else {
+        setError(result.error);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
-
-    if (client.password !== password) {
-      setError('Invalid password');
-      return;
-    }
-
-    // Store demo token
-    const token = `demo_token_${username.toLowerCase()}`;
-    localStorage.setItem('demo_token', token);
-    setTokenDebug(`Stored token: ${token}`);
-    setDebug(`Login successful for ${username}. Agent ID: ${client.id}`);
-
-    // Call the onLogin callback if provided
-    if (onLogin) {
-      onLogin({ username, agentId: client.id });
-    }
-
-    // Navigate to the app
-    navigate('/app');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('demo_token');
-    setCurrentToken('');
-    setTokenDebug('');
-    setDebug('');
-    setError('');
+  const handleLogout = async () => {
+    try {
+      await signOutUser();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
@@ -87,18 +104,18 @@ export default function Login({ onLogin }) {
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
-                    Username
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                    Email Address
                   </label>
                   <input
-                    id="username"
-                    name="username"
-                    type="text"
+                    id="email"
+                    name="email"
+                    type="email"
                     required
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Enter your username"
-                    value={form.username}
-                    onChange={(e) => setForm({ ...form, username: e.target.value })}
+                    placeholder="Enter your email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
                   />
                 </div>
                 <div>
@@ -124,46 +141,32 @@ export default function Login({ onLogin }) {
                 </div>
               )}
 
-              {debug && (
-                <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-4">
-                  <p className="text-green-400 text-sm">{debug}</p>
-                </div>
-              )}
-
-              {tokenDebug && (
-                <div className="bg-blue-500/20 border border-blue-500/50 rounded-lg p-4">
-                  <p className="text-blue-400 text-sm">{tokenDebug}</p>
-                </div>
-              )}
-
               <div>
                 <button
                   type="submit"
-                  className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg text-white font-semibold hover:from-purple-700 hover:to-blue-700 transition"
+                  disabled={loading}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg text-white font-semibold hover:from-purple-700 hover:to-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Sign In
+                  {loading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                      Signing In...
+                    </div>
+                  ) : (
+                    'Sign In'
+                  )}
                 </button>
               </div>
-
-              {currentToken && (
-                <div className="text-center">
-                  <p className="text-sm text-gray-400">Currently logged in as: {currentToken.replace('demo_token_', '')}</p>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="mt-2 text-sm text-purple-400 hover:text-purple-300"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
 
               <div className="text-center">
                 <p className="text-gray-400 text-sm">
                   Don't have an account?{' '}
-                  <a href="/register" className="text-purple-400 hover:text-purple-300 transition">
+                  <button
+                    onClick={() => navigate('/register')}
+                    className="text-purple-400 hover:text-purple-300 font-semibold underline"
+                  >
                     Create one here
-                  </a>
+                  </button>
                 </p>
               </div>
             </form>

@@ -4,10 +4,12 @@
   "private": true,
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
+    "@paypal/react-paypal-js": "^8.9.1",
     "@vapi-ai/web": "^2.3.10",
     "autoprefixer": "^10.4.21",
     "core-js-pure": "^3.43.0",
     "cra-template-pwa": "2.0.0",
+    "firebase": "^12.2.1",
     "nodemailer": "^7.0.6",
     "postcss": "^8.5.6",
     "react": "^18.2.0",
@@ -20,7 +22,19 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "test:ci": "react-scripts test --coverage --watchAll=false --ci",
+    "eject": "react-scripts eject",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "cypress:run:chrome": "cypress run --browser chrome",
+    "cypress:run:firefox": "cypress run --browser firefox",
+    "cypress:run:edge": "cypress run --browser edge",
+    "cypress:run:headless": "cypress run --headless",
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open",
+    "test:e2e:ci": "cypress run --headless --browser chrome",
+    "test:all": "npm run test:ci && npm run test:e2e:ci"
   },
   "eslintConfig": {
     "extends": [
@@ -41,6 +55,9 @@
     ]
   },
   "devDependencies": {
+    "@cypress/react": "^9.0.1",
+    "@cypress/webpack-dev-server": "^5.1.1",
+    "cypress": "^15.2.0",
     "tailwindcss": "^3.4.3"
   }
 }

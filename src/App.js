@@ -4,12 +4,14 @@ import Header from './components/Header';
 import CallLogs from './components/CallLogs';
 import VoiceAgentSettings from './components/VoiceAgentSettings';
 import Login from './components/Login';
+import AdminLogin from './components/AdminLogin';
 import Registration from './components/Registration';
 import MarketingPage from './components/MarketingPage';
-import Welcome from './components/Welcome';
 import Dashboard from './components/Dashboard';
 import Settings from './components/Settings';
+import WhatsAppSettings from './components/WhatsAppSettings';
 import Sidebar from './components/Sidebar';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 export const CLIENT_AGENT_MAP = {
@@ -17,21 +19,26 @@ export const CLIENT_AGENT_MAP = {
   bernie: { id: 'acb59b5f-4648-4d63-b5bf-2595998b532a', password: 'berniepass' },
 };
 
-function App() {
+// App Content Component that uses auth context
+function AppContent() {
   const [brand] = useState('Acme Corp');
   const [toast, setToast] = useState('');
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('darkMode') === 'true' || false;
   });
-  const [authed, setAuthed] = useState(() => !!localStorage.getItem('demo_token'));
-  const [token, setToken] = useState(() => localStorage.getItem('demo_token'));
   
-  // Domain detection
+  // Use Firebase auth context
+  const { user, isAuthenticated } = useAuth();
+  
+  // Domain detection - Clean separation
   const isAppDomain = window.location.hostname === 'app.appifyai.com' || 
-                      (window.location.hostname === 'localhost' && window.location.search.includes('app=true'));
+                      window.location.hostname === 'appify-app.web.app';
   const isMarketingDomain = window.location.hostname === 'appifyai.com' || 
-                           window.location.hostname === 'www.appifyai.com' ||
-                           (window.location.hostname === 'localhost' && !window.location.search.includes('app=true'));
+                           window.location.hostname === 'www.appifyai.com';
+
+  // Get plan parameter from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedPlan = urlParams.get('plan');
 
   useEffect(() => {
     if (darkMode) {
@@ -42,42 +49,20 @@ function App() {
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
 
-  // Reactively update authed/token if localStorage changes
-  useEffect(() => {
-    const checkToken = () => {
-      const t = localStorage.getItem('demo_token');
-      setToken(t);
-      setAuthed(!!t);
-    };
-    window.addEventListener('storage', checkToken);
-    const interval = setInterval(checkToken, 500);
-    return () => {
-      window.removeEventListener('storage', checkToken);
-      clearInterval(interval);
-    };
-  }, []);
-
   const showToast = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(''), 2000);
   };
 
   const handleLogin = () => {
-    setAuthed(true);
-    setToken(localStorage.getItem('demo_token'));
+    showToast('Welcome back!');
   };
   
   const handleRegister = (userData) => {
-    setAuthed(true);
-    setToken(localStorage.getItem('demo_token'));
-    showToast(`Welcome ${userData.firstName}! Your account has been created.`);
+    showToast(`Welcome ${userData.firstName || userData.displayName}! Your account has been created.`);
   };
   
   const handleLogout = () => {
-    localStorage.removeItem('demo_token');
-    localStorage.removeItem('user');
-    setAuthed(false);
-    setToken('');
     showToast('You have been logged out successfully.');
   };
 
@@ -88,24 +73,11 @@ function App() {
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className={`w-full h-full min-h-screen flex bg-gray-900 transition-colors duration-500`}>
           <Routes>
-            <Route path="/" element={<Welcome />} />
-            <Route path="/login" element={
-              <div className="flex flex-col h-screen w-full">
-                <Header brand={brand} darkMode={darkMode} setDarkMode={setDarkMode} authed={authed} onLogout={handleLogout} />
-                <main className="flex-1 w-full max-w-7xl mx-auto px-2 md:px-8 fade-in py-8">
-                  <Login onLogin={handleLogin} />
-                </main>
-              </div>
-            } />
-            <Route path="/register" element={
-              <div className="flex flex-col h-screen w-full">
-                <Header brand={brand} darkMode={darkMode} setDarkMode={setDarkMode} authed={authed} onLogout={handleLogout} />
-                <main className="flex-1 w-full max-w-7xl mx-auto px-2 md:px-8 fade-in py-8">
-                  <Registration onRegister={handleRegister} />
-                </main>
-              </div>
-            } />
-            <Route path="/call-logs" element={authed ? 
+            <Route path="/" element={<Navigate to="/register" />} />
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route path="/admin" element={<AdminLogin onLogin={handleLogin} />} />
+            <Route path="/register" element={<Registration onRegister={handleRegister} selectedPlan={selectedPlan} />} />
+            <Route path="/call-logs" element={isAuthenticated ? 
               <div className="flex h-screen w-full">
                 <Sidebar darkMode={darkMode} setDarkMode={setDarkMode} />
                 <main className="flex-1 overflow-auto">
@@ -113,7 +85,7 @@ function App() {
                 </main>
               </div>
               : <Navigate to="/login" />} />
-            <Route path="/logs" element={authed ? 
+            <Route path="/logs" element={isAuthenticated ? 
               <div className="flex h-screen w-full">
                 <Sidebar darkMode={darkMode} setDarkMode={setDarkMode} />
                 <main className="flex-1 overflow-auto">
@@ -121,7 +93,7 @@ function App() {
                 </main>
               </div>
               : <Navigate to="/login" />} />
-            <Route path="/app" element={authed ? 
+            <Route path="/app" element={isAuthenticated ? 
               <div className="flex h-screen w-full">
                 <Sidebar darkMode={darkMode} setDarkMode={setDarkMode} />
                 <main className="flex-1 overflow-auto">
@@ -129,7 +101,7 @@ function App() {
                 </main>
               </div>
               : <Navigate to="/login" />} />
-            <Route path="/dashboard" element={authed ? 
+            <Route path="/dashboard" element={isAuthenticated ? 
               <div className="flex h-screen w-full">
                 <Sidebar darkMode={darkMode} setDarkMode={setDarkMode} />
                 <main className="flex-1 overflow-auto">
@@ -137,7 +109,7 @@ function App() {
                 </main>
               </div>
               : <Navigate to="/login" />} />
-            <Route path="/settings" element={authed ? 
+            <Route path="/settings" element={isAuthenticated ? 
               <div className="flex h-screen w-full">
                 <Sidebar darkMode={darkMode} setDarkMode={setDarkMode} />
                 <main className="flex-1 overflow-auto">
@@ -145,7 +117,15 @@ function App() {
                 </main>
               </div>
               : <Navigate to="/login" />} />
-            <Route path="*" element={<Navigate to={authed ? '/dashboard' : '/'} />} />
+            <Route path="/whatsapp" element={isAuthenticated ? 
+              <div className="flex h-screen w-full">
+                <Sidebar darkMode={darkMode} setDarkMode={setDarkMode} />
+                <main className="flex-1 overflow-auto">
+                  <WhatsAppSettings />
+                </main>
+              </div>
+              : <Navigate to="/login" />} />
+            <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/register'} />} />
           </Routes>
           {toast && (
             <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-fade-in">
@@ -172,6 +152,15 @@ function App() {
         )}
       </div>
     </Router>
+  );
+}
+
+// Main App component with AuthProvider
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

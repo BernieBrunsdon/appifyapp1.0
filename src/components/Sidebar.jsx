@@ -1,8 +1,19 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { signOutUser } from '../firebase/auth';
 
 const Sidebar = ({ darkMode, setDarkMode }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOutUser();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const navItems = [
     {
@@ -30,6 +41,15 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      )
+    },
+    {
+      name: 'WhatsApp',
+      href: '/whatsapp',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
       )
     },
@@ -76,7 +96,7 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
       </nav>
 
       {/* Dark Mode Toggle */}
-      <div className="p-4 border-t border-gray-700">
+      <div className="p-4 border-t border-gray-700 space-y-2">
         <button
           onClick={() => setDarkMode(!darkMode)}
           className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors duration-200"
@@ -89,6 +109,17 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
             )}
           </svg>
           {darkMode ? 'Light Mode' : 'Dark Mode'}
+        </button>
+        
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full px-4 py-2 text-red-300 hover:bg-red-900/20 hover:text-red-200 rounded-lg transition-colors duration-200"
+        >
+          <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Logout
         </button>
       </div>
     </div>

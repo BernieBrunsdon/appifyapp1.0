@@ -39,7 +39,7 @@ const Welcome = () => {
         {/* Action Buttons */}
         <div className="space-y-4">
           <Link 
-            to="/app/login"
+            to="/login"
             className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             Sign In to Your Account
@@ -48,20 +48,20 @@ const Welcome = () => {
           <div className="text-gray-400">
             Don't have an account? 
             <Link 
-              to="/app/register" 
+              to="/register" 
               className="text-purple-400 hover:text-purple-300 ml-2 font-semibold"
             >
               Create one here
             </Link>
           </div>
           
-          {/* Demo Links */}
-          <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Admin Login */}
+          <div className="mt-6">
             <Link 
-              to="/dashboard"
-              className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-base transition-all duration-300 transform hover:scale-105 shadow-lg"
+              to="/admin"
+              className="inline-block bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white font-semibold py-3 px-6 rounded-lg text-base transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
-              Enter App Dashboard
+              🔧 Admin Login
             </Link>
           </div>
         </div>
@@ -69,7 +69,7 @@ const Welcome = () => {
         {/* Back to Marketing */}
         <div className="mt-12">
           <Link 
-            to={window.location.hostname === 'localhost' ? '/' : 'https://appifyai.com'}
+            to="https://appifyai.com"
             className="text-gray-400 hover:text-white transition-colors"
           >
             ← Back to Marketing Site
