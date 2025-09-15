@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getApiUrl } from '../utils/urlHelper';
 import { FirebaseService } from '../services/firebaseService';
+import CalendarConnection from './CalendarConnection';
 
 const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
   const [form, setForm] = useState({
@@ -11,6 +12,8 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1); // 1: Agent Setup, 2: Calendar Connection
+  const [calendarData, setCalendarData] = useState(null);
 
   // Vapi voice options
   const voiceOptions = [
@@ -176,7 +179,6 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
       const userData = JSON.parse(localStorage.getItem('user') || '{}');
       userData.agent = savedAgent;
       localStorage.setItem('user', JSON.stringify(userData));
-      console.log('✅ OnboardingModal VERSION 5.0 - Agent data saved to localStorage');
       
       if (onComplete) {
         onComplete(agentData);
@@ -191,6 +193,24 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
   };
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleCalendarConnected = (data) => {
+    setCalendarData(data);
+    if (onComplete) {
+      onComplete({ ...form, calendarData: data });
+    }
+    onClose();
+  };
+
+  const handleAgentCreated = () => {
+    setCurrentStep(2);
+  }; (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
