@@ -200,18 +200,9 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
     }
   };
 
-  const handleCalendarConnected = (data) => {
-    setCalendarData(data);
-    if (onComplete) {
-      onComplete({ ...form, calendarData: data });
-    }
-    onClose();
-  };
-
   const handleAgentCreated = () => {
     setCurrentStep(2);
-  }; (e) => {
-    const { name, value } = e.target;
+  };const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
