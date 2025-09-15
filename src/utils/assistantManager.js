@@ -1,37 +1,45 @@
-/**
- * Assistant Manager - Clean, consolidated implementation
- * Handles client-specific assistant creation and management
- */
+// Client Assistant Manager
+// Handles client-specific assistant creation and management
+
+const VAPI_REST_API_KEY = '00c60c9f-62b3-4dd3-bede-036242a2b7c5';
+const VAPI_BASE_URL = 'https://api.vapi.ai';
 
 export class AssistantManager {
   constructor(clientId) {
     this.clientId = clientId;
   }
 
-  /**
-   * Create a new assistant for this client
-   * @param {Object} settings - Assistant settings
-   * @returns {Promise<Object>} Created assistant
-   */
+  // Create a new assistant for this client
   async createAssistant(settings) {
     try {
-      const response = await fetch('/api/assistants/create', {
+      const response = await fetch(`${VAPI_BASE_URL}/assistant`, {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${VAPI_REST_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          clientId: this.clientId,
-          settings: {
-            assistantName: settings.assistantName || `Assistant for ${this.clientId}`,
-            firstMessage: settings.firstMessage || 'Hello! How can I help you today?',
+          name: settings.assistantName || `Assistant for ${this.clientId}`,
+          firstMessage: settings.firstMessage || 'Hello! How can I help you today?',
+          model: {
+            provider: 'openai',
             model: settings.model || 'gpt-4o',
             temperature: settings.temperature || 0.7,
-            voice: settings.voice || 'alloy',
-            knowledgeBase: settings.knowledgeBase,
-            websiteAddress: settings.websiteAddress,
-            businessAddress: settings.businessAddress,
-            region: settings.region
+            messages: [
+              {
+                role: 'system',
+                content: this.buildSystemPrompt(settings.knowledgeBase)
+              }
+            ]
+          },
+          voice: {
+            provider: 'openai',
+            voiceId: settings.voice || 'alloy'
+          },
+          // Add client metadata for tracking
+          metadata: {
+            clientId: this.clientId,
+            createdAt: new Date().toISOString()
           }
         })
       });
@@ -42,7 +50,7 @@ export class AssistantManager {
 
       const assistant = await response.json();
       
-      // Store assistant ID for this client
+      // Store assistant ID in Firebase for this client
       await this.saveAssistantId(assistant.id);
       
       return assistant;
@@ -52,31 +60,32 @@ export class AssistantManager {
     }
   }
 
-  /**
-   * Update existing assistant
-   * @param {string} assistantId - Assistant ID
-   * @param {Object} settings - Updated settings
-   * @returns {Promise<Object>} Updated assistant
-   */
+  // Update existing assistant
   async updateAssistant(assistantId, settings) {
     try {
-      const response = await fetch(`/api/assistants/${assistantId}`, {
+      const response = await fetch(`${VAPI_BASE_URL}/assistant/${assistantId}`, {
         method: 'PATCH',
         headers: {
+          'Authorization': `Bearer ${VAPI_REST_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          clientId: this.clientId,
-          settings: {
-            assistantName: settings.assistantName,
-            firstMessage: settings.firstMessage,
+          name: settings.assistantName,
+          firstMessage: settings.firstMessage,
+          model: {
+            provider: 'openai',
             model: settings.model,
             temperature: settings.temperature,
-            voice: settings.voice,
-            knowledgeBase: settings.knowledgeBase,
-            websiteAddress: settings.websiteAddress,
-            businessAddress: settings.businessAddress,
-            region: settings.region
+            messages: [
+              {
+                role: 'system',
+                content: this.buildSystemPrompt(settings.knowledgeBase)
+              }
+            ]
+          },
+          voice: {
+            provider: 'openai',
+            voiceId: settings.voice
           }
         })
       });
@@ -92,12 +101,14 @@ export class AssistantManager {
     }
   }
 
-  /**
-   * Get client's assistant ID from localStorage
-   * @returns {Promise<string|null>} Assistant ID or null
-   */
+  // Get client's assistant ID from Firebase
   async getAssistantId() {
     try {
+      // TODO: Replace with Firebase call
+      // const doc = await firestore.collection('clients').doc(this.clientId).get();
+      // return doc.data()?.assistantId;
+      
+      // For now, use localStorage
       return localStorage.getItem(`assistantId_${this.clientId}`);
     } catch (error) {
       console.error('Error getting assistant ID:', error);
@@ -105,13 +116,16 @@ export class AssistantManager {
     }
   }
 
-  /**
-   * Save assistant ID to localStorage
-   * @param {string} assistantId - Assistant ID to save
-   * @returns {Promise<void>}
-   */
+  // Save assistant ID to Firebase
   async saveAssistantId(assistantId) {
     try {
+      // TODO: Replace with Firebase call
+      // await firestore.collection('clients').doc(this.clientId).set({
+      //   assistantId: assistantId,
+      //   updatedAt: new Date().toISOString()
+      // }, { merge: true });
+      
+      // For now, use localStorage
       localStorage.setItem(`assistantId_${this.clientId}`, assistantId);
     } catch (error) {
       console.error('Error saving assistant ID:', error);
@@ -119,11 +133,7 @@ export class AssistantManager {
     }
   }
 
-  /**
-   * Build system prompt with knowledge base
-   * @param {string} knowledgeBase - Knowledge base content
-   * @returns {string} System prompt
-   */
+  // Build system prompt with knowledge base
   buildSystemPrompt(knowledgeBase) {
     let prompt = "You are a helpful AI assistant for a business. ";
     
@@ -137,11 +147,7 @@ export class AssistantManager {
     return prompt;
   }
 
-  /**
-   * Get or create assistant for this client
-   * @param {Object} settings - Assistant settings
-   * @returns {Promise<Object>} Assistant data
-   */
+  // Get or create assistant for this client
   async getOrCreateAssistant(settings) {
     try {
       let assistantId = await this.getAssistantId();
@@ -158,144 +164,9 @@ export class AssistantManager {
       throw error;
     }
   }
-
-  /**
-   * List assistants
-   * @param {number} limit - Maximum number of assistants to return
-   * @returns {Promise<Object>} List of assistants
-   */
-  async listAssistants(limit = 50) {
-    try {
-      const response = await fetch(`/api/assistants?limit=${limit}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to list assistants: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error listing assistants:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get specific assistant
-   * @param {string} assistantId - Assistant ID
-   * @returns {Promise<Object>} Assistant data
-   */
-  async getAssistant(assistantId) {
-    try {
-      const response = await fetch(`/api/assistants/${assistantId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to get assistant: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error getting assistant:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete assistant
-   * @param {string} assistantId - Assistant ID
-   * @returns {Promise<Object>} Deletion result
-   */
-  async deleteAssistant(assistantId) {
-    try {
-      const response = await fetch(`/api/assistants/${assistantId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete assistant: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error deleting assistant:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Make a call
-   * @param {string} assistantId - Assistant ID
-   * @param {string} phoneNumber - Phone number to call
-   * @returns {Promise<Object>} Call result
-   */
-  async makeCall(assistantId, phoneNumber) {
-    try {
-      const response = await fetch('/api/calls/make', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          assistantId: assistantId,
-          phoneNumber: phoneNumber
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to make call: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error making call:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get call logs
-   * @param {string} assistantId - Assistant ID
-   * @param {number} limit - Maximum number of logs to return
-   * @returns {Promise<Object>} Call logs
-   */
-  async getCallLogs(assistantId, limit = 50) {
-    try {
-      const response = await fetch(`/api/calls/logs?assistantId=${assistantId}&limit=${limit}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to get call logs: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error getting call logs:', error);
-      throw error;
-    }
-  }
 }
 
-/**
- * Get assistant manager instance for a client
- * @param {string} clientId - Client ID
- * @returns {AssistantManager} Assistant manager instance
- */
+// Export helper function
 export const getAssistantManager = (clientId) => {
   return new AssistantManager(clientId);
 };

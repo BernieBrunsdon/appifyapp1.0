@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { signOutUser } from '../firebase/auth';
 
-const Sidebar = ({ darkMode, setDarkMode }) => {
+const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -36,15 +36,6 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
       )
     },
     {
-      name: 'Call Logs',
-      href: '/call-logs',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      )
-    },
-    {
       name: 'WhatsApp',
       href: '/whatsapp',
       icon: (
@@ -70,11 +61,11 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
   };
 
   return (
-    <div className="w-64 bg-gray-800 text-white flex flex-col h-full">
+    <div className="w-64 bg-white/10 backdrop-blur-md border-r border-white/20 text-white flex flex-col h-full">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-700">
-        <h1 className="text-xl font-bold text-white">Appify.AI</h1>
-        <p className="text-sm text-gray-400">Voice AI Platform</p>
+      <div className="p-6 border-b border-white/20">
+        <h1 className="text-2xl font-bold text-white">Appify.AI</h1>
+        <p className="text-sm text-gray-300">Voice AI Platform</p>
       </div>
 
       {/* Navigation */}
@@ -83,10 +74,10 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
           <Link
             key={item.name}
             to={item.href}
-            className={`flex items-center px-4 py-3 rounded-lg transition-colors duration-200 ${
+            className={`flex items-center px-4 py-3 rounded-lg transition-all duration-300 ${
               isActive(item.href)
-                ? 'bg-purple-600 text-white'
-                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
+                : 'text-gray-300 hover:bg-white/20 hover:text-white'
             }`}
           >
             <span className="mr-3">{item.icon}</span>
@@ -95,26 +86,11 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
         ))}
       </nav>
 
-      {/* Dark Mode Toggle */}
-      <div className="p-4 border-t border-gray-700 space-y-2">
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors duration-200"
-        >
-          <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {darkMode ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            )}
-          </svg>
-          {darkMode ? 'Light Mode' : 'Dark Mode'}
-        </button>
-        
-        {/* Logout Button */}
+      {/* Logout Button */}
+      <div className="p-4 border-t border-white/20">
         <button
           onClick={handleLogout}
-          className="flex items-center w-full px-4 py-2 text-red-300 hover:bg-red-900/20 hover:text-red-200 rounded-lg transition-colors duration-200"
+          className="flex items-center w-full px-4 py-2 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-lg transition-all duration-300"
         >
           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

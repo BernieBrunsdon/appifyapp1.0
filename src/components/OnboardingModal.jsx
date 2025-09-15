@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getApiUrl } from '../utils/urlHelper';
 import { FirebaseService } from '../services/firebaseService';
-import unifiedAuthService from '../utils/unifiedAuthService';
 
 const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
   const [form, setForm] = useState({
@@ -12,9 +11,6 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [includeCalendar, setIncludeCalendar] = useState(false);
-  const [calendarCredentials, setCalendarCredentials] = useState(null);
-  const [calendarConnecting, setCalendarConnecting] = useState(false);
 
   // Vapi voice options
   const voiceOptions = [
@@ -31,72 +27,7 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
     return `Hello! I'm ${name}, your AI assistant. How can I help you today?`;
   };
 
-  // Connect Google Calendar
-  const connectGoogleCalendar = async () => {
-    setCalendarConnecting(true);
-    try {
-      console.log('🔍 Starting Google Calendar connection...');
-      
-      // Check if Google API is loaded
-      if (!window.gapi) {
-        console.error('❌ window.gapi not available');
-        throw new Error('Google API not loaded. Please refresh the page and try again.');
-      }
-
-      if (!window.gapi.auth2) {
-        console.error('❌ window.gapi.auth2 not available');
-        throw new Error('Google Auth2 not loaded. Please refresh the page and try again.');
-      }
-
-      console.log('🔍 Getting auth instance...');
-      const authInstance = window.gapi.auth2.getAuthInstance();
-      if (!authInstance) {
-        console.error('❌ Auth instance not available');
-        throw new Error('Google Auth not initialized. Please refresh the page and try again.');
-      }
-
-      console.log('🔍 Attempting to sign in...');
-      const authResult = await authInstance.signIn({
-        scope: 'https://www.googleapis.com/auth/calendar'
-      });
-
-      console.log('🔍 Auth result received:', authResult);
-      const authResponse = authResult.getAuthResponse();
-      console.log('🔍 Auth response:', authResponse);
-
-      const credentials = {
-        access_token: authResponse.access_token,
-        refresh_token: authResponse.refresh_token,
-        calendar_id: 'primary'
-      };
-
-      setCalendarCredentials(credentials);
-      console.log('✅ Calendar connected successfully:', credentials);
-      return credentials;
-    } catch (error) {
-      console.error('❌ Calendar connection failed:', error);
-      console.error('❌ Error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-        code: error.code
-      });
-      
-      // If it's a CSP error, try a different approach
-      if (error.message.includes('CSP') || error.message.includes('Content Security Policy')) {
-        console.log('🔄 CSP error detected, trying alternative approach...');
-        // For now, just show a message that calendar integration is not available
-        setErrors({ general: 'Calendar integration is temporarily unavailable due to security restrictions. Please try again later or contact support.' });
-      } else {
-        setErrors({ general: `Calendar connection failed: ${error.message}` });
-      }
-      return null;
-    } finally {
-      setCalendarConnecting(false);
-    }
-  };
-
-  // Initialize Google API when modal opens
+  // Create agent data when modal opens
   useEffect(() => {
     if (isOpen) {
       console.log('🔍 OnboardingModal VERSION 5.0 - Modal opened, creating agent data...');
@@ -108,37 +39,8 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
         firstMessage: 'Hello! I\'m Appy, your AI assistant. How can I help you today?',
         systemPrompt: 'You are Appy, the official AI assistant for AppifyAI - a cutting-edge AI communication platform that helps businesses automate their customer interactions through intelligent voice assistants, WhatsApp integration, and multi-channel AI receptionists.'
       });
-
-      // Initialize Google API
-      initializeGoogleAPI();
     }
   }, [isOpen]);
-
-  // Initialize Google API
-  const initializeGoogleAPI = () => {
-    if (window.gapi) {
-      console.log('🔍 Google API detected, initializing...');
-      window.gapi.load('auth2', () => {
-        console.log('🔍 Auth2 loaded, initializing...');
-        window.gapi.auth2.init({
-          client_id: '1031046255908-e958hi8irvbn3mmsbrq4smevv2l3mct3.apps.googleusercontent.com',
-          scope: 'https://www.googleapis.com/auth/calendar'
-        }).then(() => {
-          console.log('✅ Google API initialized successfully');
-        }).catch((error) => {
-          console.error('❌ Google API initialization failed:', error);
-          console.error('❌ Error details:', {
-            name: error.name,
-            message: error.message,
-            code: error.code
-          });
-        });
-      });
-    } else {
-      console.warn('⚠️ Google API not loaded yet, retrying in 1 second...');
-      setTimeout(initializeGoogleAPI, 1000);
-    }
-  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -194,51 +96,58 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
         }
       }
       
-      // Prepare agent data with calendar if connected
-      const requestData = {
-        ...form, 
-        clientId: currentClientData.id, 
-        plan: currentClientData.plan
-      };
-
-      // Add calendar data if connected
-      if (includeCalendar && calendarCredentials) {
-        requestData.calendar = {
-          provider: 'google',
-          credentials: calendarCredentials
-        };
-        console.log('📅 Including calendar data in agent creation:', requestData.calendar);
-      }
-
-      // Use unified authentication service
-      const response = await unifiedAuthService.apiRequest('/api/unified-auth/create-agent', {
+      const response = await fetch(`${API_URL}/api/agents/create`, {
         method: 'POST',
-        body: JSON.stringify({
-          agentData: requestData
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          ...form, 
+          clientId: currentClientData.id, 
+          plan: currentClientData.plan 
         })
       });
 
       let result;
       if (!response.ok) {
-        console.warn('⚠️ Backend agent creation failed, creating local agent data...');
-        // Create local agent data even if backend fails
+        console.error('❌ Backend agent creation failed, creating Vapi assistant directly...');
+        
+        // Create Vapi assistant directly - NO MOCK DATA
+        const vapiResponse = await fetch('https://api.vapi.ai/assistant', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer 00c60c9f-62b3-4dd3-bede-036242a2b7c5`
+          },
+          body: JSON.stringify({
+            name: form.agentName,
+            model: {
+              provider: 'openai',
+              model: 'gpt-4',
+              systemMessage: form.systemPrompt,
+              firstMessage: form.firstMessage,
+              voice: form.agentVoice
+            }
+          })
+        });
+        
+        if (!vapiResponse.ok) {
+          const errorText = await vapiResponse.text();
+          throw new Error(`Vapi assistant creation failed: ${vapiResponse.status} - ${errorText}`);
+        }
+        
+        const vapiAssistant = await vapiResponse.json();
         result = {
           agentId: `agent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          vapiAssistantId: `vapi_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          vapiAssistantId: vapiAssistant.id,
           assignedPhoneNumber: '+1 (555) 123-4567',
           whatsappNumber: '+1 (555) 987-6543',
           voiceNumber: '+1 (555) 456-7890'
         };
-        console.log('🔍 Created local agent data:', result);
+        console.log('✅ Vapi assistant created directly:', result);
       } else {
         result = await response.json();
         console.log('✅ Backend agent creation successful:', result);
-      }
-
-      // Verify the assistant was actually created in Vapi
-      if (!result.vapiAssistantId || result.vapiAssistantId.startsWith('mock_')) {
-        console.warn('⚠️ Vapi assistant creation failed, using fallback ID...');
-        result.vapiAssistantId = `vapi_fallback_${Date.now()}`;
       }
 
       // Create agent data for Firebase
@@ -385,64 +294,6 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
             />
             {errors.systemPrompt && <p className="text-red-400 text-sm mt-1">{errors.systemPrompt}</p>}
             <p className="text-gray-400 text-sm mt-1">Describe your business and what your assistant should help customers with</p>
-          </div>
-
-          {/* Calendar Integration */}
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-            <div className="flex items-start">
-              <input
-                type="checkbox"
-                id="includeCalendar"
-                checked={includeCalendar}
-                onChange={(e) => setIncludeCalendar(e.target.checked)}
-                className="mt-1 mr-3"
-              />
-              <div className="flex-1">
-                <label htmlFor="includeCalendar" className="block text-sm font-medium text-blue-300 mb-2">
-                  Connect Google Calendar for meeting booking
-                </label>
-                <p className="text-blue-200 text-sm mb-3">
-                  Allow your AI assistant to book meetings directly into your calendar
-                </p>
-                
-                {includeCalendar && (
-                  <div className="mt-3">
-                    {!calendarCredentials ? (
-                      <button
-                        type="button"
-                        onClick={connectGoogleCalendar}
-                        disabled={calendarConnecting}
-                        className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {calendarConnecting ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                            Connecting...
-                          </>
-                        ) : (
-                          <>
-                            <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                            Connect Google Calendar
-                          </>
-                        )}
-                      </button>
-                    ) : (
-                      <div className="flex items-center text-green-400">
-                        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                        </svg>
-                        Calendar Connected Successfully!
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
           {/* General Error */}

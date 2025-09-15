@@ -49,7 +49,6 @@ const AdminLogin = ({ onLogin }) => {
 
       // Store admin data
       localStorage.setItem('user', JSON.stringify(adminUser));
-      localStorage.setItem('demo_token', `admin_${adminUser.id}`);
       
       if (onLogin) {
         onLogin(adminUser);

@@ -7,7 +7,7 @@ import {
   sendEmailVerification,
   updateProfile,
   onAuthStateChanged,
-  User
+  reload
 } from 'firebase/auth';
 import { auth } from './config';
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
@@ -38,13 +38,34 @@ export const onAuthStateChange = (callback) => {
 // Get current user
 export const getCurrentUser = () => currentUser;
 
-// Check if user is authenticated
-export const isAuthenticated = () => !!currentUser;
+// Check if user is authenticated and email is verified
+export const isAuthenticated = () => {
+  return !!currentUser && currentUser.emailVerified;
+};
 
-// Register new user
+// Check if user is authenticated but email not verified
+export const isAuthenticatedButUnverified = () => {
+  return !!currentUser && !currentUser.emailVerified;
+};
+
+// Email validation function
+const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+// Register new user with email verification enforcement
 export const registerUser = async (email, password, userData = {}) => {
   try {
-    console.log('🔐 Registering user with email:', email);
+    // Validate email format
+    if (!validateEmail(email)) {
+      return { success: false, error: 'Please enter a valid email address.' };
+    }
+
+    // Validate password strength
+    if (password.length < 6) {
+      return { success: false, error: 'Password must be at least 6 characters long.' };
+    }
     
     // Create user account
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -55,10 +76,10 @@ export const registerUser = async (email, password, userData = {}) => {
       displayName: userData.name || userData.agentName || 'User'
     });
     
-    // Send email verification
+    // Send email verification immediately
     await sendEmailVerification(user);
     
-    // Save user data to Firestore
+    // Save user data to Firestore with emailVerified: false
     await setDoc(doc(db, 'users', user.uid), {
       uid: user.uid,
       email: user.email,
@@ -69,12 +90,14 @@ export const registerUser = async (email, password, userData = {}) => {
       ...userData
     });
     
-    console.log('✅ User registered successfully:', user.uid);
-    return { success: true, user, message: 'Account created successfully! Please check your email to verify your account.' };
+    return { 
+      success: true, 
+      user, 
+      message: 'Account created successfully! Please check your email and click the verification link to activate your account.',
+      requiresVerification: true
+    };
     
   } catch (error) {
-    console.error('❌ Registration error:', error);
-    
     let errorMessage = 'Registration failed. Please try again.';
     
     switch (error.code) {
@@ -82,42 +105,54 @@ export const registerUser = async (email, password, userData = {}) => {
         errorMessage = 'An account with this email already exists. Please use a different email or try logging in.';
         break;
       case 'auth/weak-password':
-        errorMessage = 'Password should be at least 6 characters long.';
+        errorMessage = 'Password is too weak. Please choose a stronger password.';
         break;
       case 'auth/invalid-email':
         errorMessage = 'Please enter a valid email address.';
         break;
-      default:
-        errorMessage = error.message || errorMessage;
+      case 'auth/operation-not-allowed':
+        errorMessage = 'Email registration is currently disabled. Please contact support.';
+        break;
     }
     
     return { success: false, error: errorMessage };
   }
 };
 
-// Sign in user
+// Sign in user with email verification check
 export const signInUser = async (email, password) => {
   try {
-    console.log('🔐 Signing in user:', email);
-    
+    // Validate email format
+    if (!validateEmail(email)) {
+      return { success: false, error: 'Please enter a valid email address.' };
+    }
+
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     
+    // Check if email is verified
+    if (!user.emailVerified) {
+      // Sign out the user since email is not verified
+      await signOut(auth);
+      return { 
+        success: false, 
+        error: 'Please verify your email address before signing in. Check your inbox for the verification email.',
+        requiresVerification: true
+      };
+    }
+    
     // Get user data from Firestore
     const userDoc = await getDoc(doc(db, 'users', user.uid));
-    const userData = userDoc.exists() ? userDoc.data() : null;
+    const userData = userDoc.exists() ? userDoc.data() : {};
     
-    console.log('✅ User signed in successfully:', user.uid);
     return { success: true, user, userData };
     
   } catch (error) {
-    console.error('❌ Sign in error:', error);
-    
     let errorMessage = 'Sign in failed. Please try again.';
     
     switch (error.code) {
       case 'auth/user-not-found':
-        errorMessage = 'No account found with this email. Please check your email or create a new account.';
+        errorMessage = 'No account found with this email address. Please check your email or create a new account.';
         break;
       case 'auth/wrong-password':
         errorMessage = 'Incorrect password. Please try again.';
@@ -125,11 +160,12 @@ export const signInUser = async (email, password) => {
       case 'auth/invalid-email':
         errorMessage = 'Please enter a valid email address.';
         break;
+      case 'auth/user-disabled':
+        errorMessage = 'This account has been disabled. Please contact support.';
+        break;
       case 'auth/too-many-requests':
         errorMessage = 'Too many failed attempts. Please try again later.';
         break;
-      default:
-        errorMessage = error.message || error.message || errorMessage;
     }
     
     return { success: false, error: errorMessage };
@@ -139,49 +175,10 @@ export const signInUser = async (email, password) => {
 // Sign out user
 export const signOutUser = async () => {
   try {
-    console.log('🔐 Signing out user');
     await signOut(auth);
-    
-    // Clear localStorage
-    localStorage.removeItem('user');
-    localStorage.removeItem('agentData');
-    
-    console.log('✅ User signed out successfully');
     return { success: true };
-    
   } catch (error) {
-    console.error('❌ Sign out error:', error);
     return { success: false, error: 'Sign out failed. Please try again.' };
-  }
-};
-
-// Send password reset email
-export const resetPassword = async (email) => {
-  try {
-    console.log('🔐 Sending password reset email to:', email);
-    
-    await sendPasswordResetEmail(auth, email);
-    
-    console.log('✅ Password reset email sent successfully');
-    return { success: true, message: 'Password reset email sent! Please check your inbox.' };
-    
-  } catch (error) {
-    console.error('❌ Password reset error:', error);
-    
-    let errorMessage = 'Failed to send password reset email. Please try again.';
-    
-    switch (error.code) {
-      case 'auth/user-not-found':
-        errorMessage = 'No account found with this email. Please check your email or create a new account.';
-        break;
-      case 'auth/invalid-email':
-        errorMessage = 'Please enter a valid email address.';
-        break;
-      default:
-        errorMessage = error.message || errorMessage;
-    }
-    
-    return { success: false, error: errorMessage };
   }
 };
 
@@ -192,15 +189,59 @@ export const resendEmailVerification = async () => {
       return { success: false, error: 'No user is currently signed in.' };
     }
     
-    console.log('🔐 Resending email verification');
     await sendEmailVerification(currentUser);
-    
-    console.log('✅ Email verification sent successfully');
     return { success: true, message: 'Verification email sent! Please check your inbox.' };
     
   } catch (error) {
-    console.error('❌ Email verification error:', error);
     return { success: false, error: 'Failed to send verification email. Please try again.' };
+  }
+};
+
+// Check email verification status
+export const checkEmailVerification = async () => {
+  try {
+    if (!currentUser) {
+      return { success: false, error: 'No user is currently signed in.' };
+    }
+    
+    // Reload user to get latest verification status
+    await reload(currentUser);
+    
+    return { 
+      success: true, 
+      emailVerified: currentUser.emailVerified,
+      message: currentUser.emailVerified ? 'Email is verified!' : 'Email verification required.'
+    };
+    
+  } catch (error) {
+    return { success: false, error: 'Failed to check verification status.' };
+  }
+};
+
+// Send password reset email
+export const resetPassword = async (email) => {
+  try {
+    // Validate email format
+    if (!validateEmail(email)) {
+      return { success: false, error: 'Please enter a valid email address.' };
+    }
+
+    await sendPasswordResetEmail(auth, email);
+    return { success: true, message: 'Password reset email sent! Please check your inbox.' };
+    
+  } catch (error) {
+    let errorMessage = 'Failed to send password reset email. Please try again.';
+    
+    switch (error.code) {
+      case 'auth/user-not-found':
+        errorMessage = 'No account found with this email address.';
+        break;
+      case 'auth/invalid-email':
+        errorMessage = 'Please enter a valid email address.';
+        break;
+    }
+    
+    return { success: false, error: errorMessage };
   }
 };
 
@@ -211,10 +252,12 @@ export const updateUserProfile = async (updates) => {
       return { success: false, error: 'No user is currently signed in.' };
     }
     
-    console.log('🔐 Updating user profile');
-    
     // Update Firebase Auth profile
-    await updateProfile(currentUser, updates);
+    if (updates.displayName) {
+      await updateProfile(currentUser, {
+        displayName: updates.displayName
+      });
+    }
     
     // Update Firestore document
     await updateDoc(doc(db, 'users', currentUser.uid), {
@@ -222,11 +265,8 @@ export const updateUserProfile = async (updates) => {
       updatedAt: new Date().toISOString()
     });
     
-    console.log('✅ User profile updated successfully');
-    return { success: true, message: 'Profile updated successfully!' };
-    
+    return { success: true };
   } catch (error) {
-    console.error('❌ Profile update error:', error);
     return { success: false, error: 'Failed to update profile. Please try again.' };
   }
 };
@@ -234,8 +274,14 @@ export const updateUserProfile = async (updates) => {
 // Get user data from Firestore
 export const getUserData = async (uid) => {
   try {
-    const userDoc = await getDoc(doc(db, 'users', uid));
-    return userDoc.exists() ? userDoc.data() : null;
+    const userRef = doc(db, 'users', uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      return userSnap.data();
+    } else {
+      return null;
+    }
   } catch (error) {
     console.error('❌ Error getting user data:', error);
     return null;
@@ -244,26 +290,25 @@ export const getUserData = async (uid) => {
 
 // Check if email is already registered
 export const checkEmailExists = async (email) => {
-  try {
-    // This is a simple check - in production, you might want to use a Cloud Function
-    // For now, we'll rely on the registration error handling
-    return false;
-  } catch (error) {
-    console.error('❌ Error checking email:', error);
-    return false;
-  }
+  // This is a simple check - in production, you might want to use a Cloud Function
+  // For now, we'll rely on the registration error handling
+  return false;
 };
 
-export default {
+const authService = {
   registerUser,
   signInUser,
   signOutUser,
   resetPassword,
   resendEmailVerification,
+  checkEmailVerification,
   updateUserProfile,
   getUserData,
   checkEmailExists,
   getCurrentUser,
   isAuthenticated,
+  isAuthenticatedButUnverified,
   onAuthStateChange
 };
+
+export default authService;

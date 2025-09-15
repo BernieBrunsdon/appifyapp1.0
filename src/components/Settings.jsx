@@ -94,7 +94,8 @@ const Settings = () => {
 
     try {
       // Get client ID (for now, use a mock ID - will be from Firebase auth later)
-      const clientId = localStorage.getItem('demo_token') || 'demo-client';
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const clientId = user.id || 'demo-client';
       const assistantManager = getAssistantManager(clientId);
       
       // Save settings to localStorage
@@ -122,28 +123,28 @@ const Settings = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen gradient-bg-professional flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-accent-blue/20 border-t-accent-blue rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-text-secondary">Loading settings...</p>
+          <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading settings...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen gradient-bg-professional">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="bg-secondary-bg border-b border-border-gray px-6 py-4">
+      <div className="bg-white border-b border-slate-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-text-primary heading-primary">AI Assistant Settings</h1>
-            <p className="text-text-secondary">Configure your voice AI assistant</p>
+            <h1 className="text-2xl font-semibold text-slate-900">AI Assistant Settings</h1>
+            <p className="text-slate-600">Configure your voice AI assistant</p>
           </div>
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? 'Saving...' : 'Save Settings'}
           </button>
@@ -156,43 +157,43 @@ const Settings = () => {
         {message && (
           <div className={`mb-6 p-4 rounded-lg ${
             message.includes('Error') 
-              ? 'bg-red-500/10 text-red-300 border border-red-500/20' 
-              : 'bg-green-500/10 text-green-300 border border-green-500/20'
+              ? 'bg-red-50 text-red-700 border border-red-200' 
+              : 'bg-green-50 text-green-700 border border-green-200'
           }`}>
             {message}
           </div>
         )}
 
         {/* Basic Settings */}
-        <div className="card mb-6">
-          <div className="px-6 py-4 border-b border-border-gray">
-            <h2 className="text-lg font-semibold text-text-primary">Basic Settings</h2>
-            <p className="text-sm text-text-secondary">Configure your assistant's basic behavior</p>
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 mb-6">
+          <div className="px-6 py-4 border-b border-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900">Basic Settings</h2>
+            <p className="text-sm text-slate-600">Configure your assistant's basic behavior</p>
           </div>
           <div className="p-6 space-y-6">
             {/* Assistant Name */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Assistant Name
               </label>
               <input
                 type="text"
                 value={settings.assistantName}
                 onChange={(e) => handleInputChange('assistantName', e.target.value)}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="My AI Assistant"
               />
             </div>
 
             {/* First Message */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 First Message
               </label>
               <textarea
                 value={settings.firstMessage}
                 onChange={(e) => handleInputChange('firstMessage', e.target.value)}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 rows={3}
                 placeholder="Hello! How can I help you today?"
               />
@@ -200,13 +201,13 @@ const Settings = () => {
 
             {/* Voice Selection */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Voice
               </label>
               <select
                 value={settings.voice}
                 onChange={(e) => handleInputChange('voice', e.target.value)}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 {voiceOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -218,13 +219,13 @@ const Settings = () => {
 
             {/* Model Selection */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 AI Model
               </label>
               <select
                 value={settings.model}
                 onChange={(e) => handleInputChange('model', e.target.value)}
-                className="input-field w-full"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 {modelOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -236,7 +237,7 @@ const Settings = () => {
 
             {/* Temperature */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Creativity Level: {settings.temperature}
               </label>
               <input
@@ -246,9 +247,9 @@ const Settings = () => {
                 step="0.1"
                 value={settings.temperature}
                 onChange={(e) => handleInputChange('temperature', parseFloat(e.target.value))}
-                className="w-full h-2 bg-border-gray rounded-lg appearance-none cursor-pointer slider"
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
               />
-              <div className="flex justify-between text-xs text-text-secondary mt-1">
+              <div className="flex justify-between text-xs text-slate-500 mt-1">
                 <span>Focused</span>
                 <span>Creative</span>
               </div>
@@ -257,16 +258,16 @@ const Settings = () => {
         </div>
 
         {/* Knowledge Base */}
-        <div className="card">
-          <div className="px-6 py-4 border-b border-border-gray">
-            <h2 className="text-lg font-semibold text-text-primary">Knowledge Base</h2>
-            <p className="text-sm text-text-secondary">Add information about your business to help your assistant answer questions</p>
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+          <div className="px-6 py-4 border-b border-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900">Knowledge Base</h2>
+            <p className="text-sm text-slate-600">Add information about your business to help your assistant answer questions</p>
           </div>
           <div className="p-6">
             <textarea
               value={settings.knowledgeBase}
               onChange={(e) => handleInputChange('knowledgeBase', e.target.value)}
-              className="input-field w-full"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               rows={8}
               placeholder="Enter information about your business, products, services, policies, etc. This will help your AI assistant provide accurate and helpful responses to your customers.
 
@@ -277,7 +278,7 @@ Example:
 - Our pricing starts at $99/month
 - We have offices in New York and San Francisco"
             />
-            <div className="mt-2 text-sm text-text-secondary">
+            <div className="mt-2 text-sm text-slate-500">
               This information will be added to your assistant's system prompt to help it understand your business better.
             </div>
           </div>

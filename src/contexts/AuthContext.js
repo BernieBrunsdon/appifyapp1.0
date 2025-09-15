@@ -1,6 +1,6 @@
 // Authentication Context for React
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChange, getCurrentUser, isAuthenticated } from '../firebase/auth';
+import { onAuthStateChange, isAuthenticated, isAuthenticatedButUnverified } from '../firebase/auth';
 
 const AuthContext = createContext();
 
@@ -20,57 +20,36 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChange((user) => {
       setUser(user);
+      setLoading(false);
       
       if (user) {
-        console.log('🔍 AuthContext - User authenticated, loading data...');
-        
-        // Load user data from localStorage
+        // Load user data from localStorage or Firestore
         const storedUserData = localStorage.getItem('user');
-        const storedAgentData = localStorage.getItem('agentData');
-        
-        let userData = null;
-        let agentData = null;
-        
-        // Parse user data
         if (storedUserData) {
           try {
-            userData = JSON.parse(storedUserData);
-            console.log('✅ AuthContext - User data loaded:', userData);
+            const parsedUserData = JSON.parse(storedUserData);
+            setUserData(parsedUserData);
           } catch (error) {
-            console.error('❌ Error parsing stored user data:', error);
+            console.error('Error parsing stored user data:', error);
           }
         }
         
-        // Parse agent data
+        // Also ensure agent data is available in localStorage
+        const storedAgentData = localStorage.getItem('agentData');
         if (storedAgentData) {
           try {
-            agentData = JSON.parse(storedAgentData);
-            console.log('✅ AuthContext - Agent data loaded:', agentData);
+            const parsedAgentData = JSON.parse(storedAgentData);
+            // Update userData with agent information
+            setUserData(prev => ({
+              ...prev,
+              agent: parsedAgentData
+            }));
           } catch (error) {
-            console.error('❌ Error parsing stored agent data:', error);
+            console.error('Error parsing stored agent data:', error);
           }
         }
-        
-        // Combine user and agent data
-        if (userData && agentData) {
-          const combinedData = {
-            ...userData,
-            agent: agentData
-          };
-          setUserData(combinedData);
-          console.log('✅ AuthContext - Combined data set:', combinedData);
-        } else if (userData) {
-          setUserData(userData);
-          console.log('✅ AuthContext - User data set (no agent):', userData);
-        } else {
-          console.log('⚠️ AuthContext - No user data found');
-        }
-        
-        setLoading(false);
       } else {
-        console.log('🔍 AuthContext - User not authenticated, clearing data');
         setUserData(null);
-        setLoading(false);
       }
     });
 
@@ -81,7 +60,8 @@ export const AuthProvider = ({ children }) => {
     user,
     userData,
     loading,
-    isAuthenticated: isAuthenticated()
+    isAuthenticated: isAuthenticated(),
+    isAuthenticatedButUnverified: isAuthenticatedButUnverified()
   };
 
   return (

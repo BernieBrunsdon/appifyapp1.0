@@ -138,7 +138,6 @@ export default function Registration({ onRegister, selectedPlan }) {
       const emailExists = await FirebaseService.checkEmailExists(form.email);
       if (emailExists) {
         setErrors({ general: 'An account with this email already exists. Please use a different email or try logging in.' });
-        setLoading(false);
         return;
       }
       
@@ -152,6 +151,33 @@ export default function Registration({ onRegister, selectedPlan }) {
       });
       
       if (result.success) {
+        // Check if email verification is required
+        if (result.requiresVerification) {
+          // Create client data for Firebase
+          const clientData = {
+            id: result.user.uid,
+            uid: result.user.uid,
+            email: result.user.email,
+            displayName: result.user.displayName,
+            firstName: form.firstName,
+            lastName: form.lastName,
+            company: form.company,
+            phone: form.phone,
+            plan: form.plan,
+            status: 'pending_verification'
+          };
+          
+          // Save client to Firebase
+          await FirebaseService.createClient(clientData);
+          
+          // Store user data in localStorage
+          localStorage.setItem('user', JSON.stringify(clientData));
+          
+          // Redirect to email verification
+          window.location.href = '/verify-email';
+          return;
+        }
+        
         // Create client data for Firebase
         const clientData = {
           id: result.user.uid,
@@ -168,7 +194,6 @@ export default function Registration({ onRegister, selectedPlan }) {
         
         // Save client to Firebase
         await FirebaseService.createClient(clientData);
-        console.log('✅ Client saved to Firebase:', clientData.id);
         
         // Store user data in localStorage
         localStorage.setItem('user', JSON.stringify(clientData));
@@ -286,7 +311,6 @@ export default function Registration({ onRegister, selectedPlan }) {
       
       // Store updated client data
       localStorage.setItem('user', JSON.stringify(updatedClientData));
-      localStorage.setItem('demo_token', `user_${updatedClientData.id}`);
       
       // Store client data in state
       setClientData(updatedClientData);
