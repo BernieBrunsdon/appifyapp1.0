@@ -202,11 +202,6 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
 
   const handleAgentCreated = () => {
     setCurrentStep(2);
-  };const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
   };
 
   if (!isOpen) return null;
