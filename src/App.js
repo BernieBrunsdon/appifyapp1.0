@@ -10,6 +10,7 @@ import Settings from './components/Settings';
 import WhatsAppSettings from './components/WhatsAppSettings';
 import Sidebar from './components/Sidebar';
 import EmailVerification from './components/EmailVerification';
+import OnboardingModal from './components/OnboardingModal';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
@@ -17,6 +18,35 @@ export const CLIENT_AGENT_MAP = {
   neil: { id: 'acb59b5f-4648-4d63-b5bf-2595998b532a', password: 'neilpass' },
   bernie: { id: 'acb59b5f-4648-4d63-b5bf-2595998b532a', password: 'berniepass' },
 };
+
+// Onboarding Page Component
+function OnboardingPage({ onComplete }) {
+  const { userData } = useAuth();
+  
+  return (
+    <div className="min-h-screen bg-gray-900">
+      <OnboardingModal 
+        isOpen={true} 
+        onClose={() => {}} 
+        clientData={userData}
+        onComplete={(agentData) => {
+          // Store agent data in localStorage
+          localStorage.setItem('agentData', JSON.stringify(agentData));
+          
+          // Update user data with agent info
+          const updatedUserData = {
+            ...userData,
+            agent: agentData
+          };
+          localStorage.setItem('user', JSON.stringify(updatedUserData));
+          
+          // Navigate to dashboard
+          onComplete();
+        }}
+      />
+    </div>
+  );
+}
 
 // App Content Component that uses auth context
 function AppContent() {
@@ -70,7 +100,40 @@ function AppContent() {
             <Route path="/admin" element={<AdminLogin onLogin={handleLogin} />} />
             <Route path="/register" element={<Registration onRegister={handleRegister} selectedPlan={selectedPlan} />} />
             <Route path="/verify-email" element={isAuthenticatedButUnverified ? 
-              <EmailVerification userEmail={user?.email} onVerified={() => window.location.href = '/dashboard'} />
+              <EmailVerification userEmail={user?.email} onVerified={() => {
+                // Check if user has already set up their assistant
+                const storedAgentData = localStorage.getItem('agentData');
+                const storedUser = localStorage.getItem('user');
+                
+                let hasAssistant = false;
+                if (storedAgentData) {
+                  try {
+                    const agentData = JSON.parse(storedAgentData);
+                    hasAssistant = !!(agentData.vapiAssistantId || agentData.id);
+                  } catch (err) {
+                    console.error('Error parsing stored agent data:', err);
+                  }
+                } else if (storedUser) {
+                  try {
+                    const userData = JSON.parse(storedUser);
+                    hasAssistant = !!(userData.agent && userData.agent.vapiAssistantId);
+                  } catch (err) {
+                    console.error('Error parsing stored user data:', err);
+                  }
+                }
+                
+                // Redirect to assistant setup if no assistant found, otherwise to dashboard
+                if (hasAssistant) {
+                  window.location.href = '/dashboard';
+                } else {
+                  // Show onboarding modal by redirecting to a special route
+                  window.location.href = '/onboarding';
+                }
+              }} />
+              : <Navigate to="/login" />} />
+            <Route path="/onboarding" element={isAuthenticated ? 
+              <OnboardingPage onComplete={() => window.location.href = '/dashboard'} />
+              : isAuthenticatedButUnverified ? <Navigate to="/verify-email" />
               : <Navigate to="/login" />} />
             <Route path="/app" element={isAuthenticated ? 
               <div className="flex h-screen w-full">

@@ -1,13 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
+import OnboardingModal from './OnboardingModal';
 
 const API_URL = 'https://api.vapi.ai/assistant';
 const REST_API_KEY = '00c60c9f-62b3-4dd3-bede-036242a2b7c5';
 const PUBLIC_KEY = '1982777e-4159-4b67-981d-4a99ae5faf31';
 
-function getCurrentUsername() {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  return user.firstName || user.displayName || '';
-}
 
 export default function VoiceAgentSettings({ showToast }) {
   const [loading, setLoading] = useState(true);
@@ -17,6 +14,7 @@ export default function VoiceAgentSettings({ showToast }) {
   const [callStatus, setCallStatus] = useState('idle');
   const [vapiLoaded, setVapiLoaded] = useState(false);
   const [agentData, setAgentData] = useState(null);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   
   const vapiRef = useRef(null);
 
@@ -218,16 +216,27 @@ export default function VoiceAgentSettings({ showToast }) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
-          <div className="text-red-400 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-white mb-2">No Assistant Found</h2>
-          <p className="text-gray-300 mb-4">Please set up your AI assistant first.</p>
+          <div className="text-purple-400 text-6xl mb-4">🤖</div>
+          <h2 className="text-2xl font-bold text-white mb-2">Welcome to Appify.AI!</h2>
+          <p className="text-gray-300 mb-4">Let's set up your AI assistant to get started.</p>
           <button 
-            onClick={() => window.location.href = '/register'}
+            onClick={() => setShowOnboardingModal(true)}
             className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg transition-all duration-300 shadow-lg"
           >
             Set Up Assistant
           </button>
         </div>
+        
+        {/* Onboarding Modal */}
+        <OnboardingModal 
+          isOpen={showOnboardingModal} 
+          onClose={() => setShowOnboardingModal(false)} 
+          clientData={JSON.parse(localStorage.getItem('user') || '{}')}
+          onComplete={(agentData) => {
+            // Reload the component to show the assistant settings
+            window.location.reload();
+          }}
+        />
       </div>
     );
   }

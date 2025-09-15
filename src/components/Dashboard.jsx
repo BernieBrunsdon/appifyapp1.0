@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import OnboardingModal from './OnboardingModal';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -13,6 +14,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [agentData, setAgentData] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
 
   // Load agent and user data from localStorage
   useEffect(() => {
@@ -148,16 +150,27 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-red-400 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-white mb-2">No Assistant Found</h2>
-          <p className="text-gray-300 mb-4">Please set up your AI assistant first.</p>
+          <div className="text-purple-400 text-6xl mb-4">🤖</div>
+          <h2 className="text-2xl font-bold text-white mb-2">Welcome to Appify.AI!</h2>
+          <p className="text-gray-300 mb-4">Let's set up your AI assistant to get started.</p>
           <button 
-            onClick={() => window.location.href = '/app'}
+            onClick={() => setShowOnboardingModal(true)}
             className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition"
           >
             Set Up Assistant
           </button>
         </div>
+        
+        {/* Onboarding Modal */}
+        <OnboardingModal 
+          isOpen={showOnboardingModal} 
+          onClose={() => setShowOnboardingModal(false)} 
+          clientData={JSON.parse(localStorage.getItem('user') || '{}')}
+          onComplete={(agentData) => {
+            // Reload the component to show the dashboard
+            window.location.reload();
+          }}
+        />
       </div>
     );
   }
