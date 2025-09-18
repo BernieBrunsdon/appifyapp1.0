@@ -35,8 +35,15 @@ export default function EmailVerification({ userEmail, onVerified }) {
       const result = await checkEmailVerification();
       if (result.success && result.emailVerified) {
         setMessage('Email verified successfully! Redirecting...');
+        console.log('✅ Email verification successful - setting flag');
+        
+        // Redirect directly to onboarding flow
+        console.log('🔍 EmailVerification - Redirecting to onboarding flow');
+        console.log('🔍 Current URL:', window.location.href);
+        console.log('🔍 Will redirect to:', window.location.origin + '/onboarding');
         setTimeout(() => {
-          onVerified();
+          console.log('🔍 Executing redirect now...');
+          window.location.href = '/onboarding';
         }, 2000);
       } else {
         setError('Email not yet verified. Please check your inbox and click the verification link.');
@@ -162,7 +169,7 @@ export default function EmailVerification({ userEmail, onVerified }) {
                     <li>• Check your email inbox (and spam folder)</li>
                     <li>• Click the verification link in the email</li>
                     <li>• Return here and click "I've Verified My Email"</li>
-                    <li>• You'll be redirected to your dashboard</li>
+                    <li>• You'll be guided through creating your AI assistant</li>
                   </ul>
                 </div>
               </div>

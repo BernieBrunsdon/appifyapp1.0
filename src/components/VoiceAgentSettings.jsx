@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import OnboardingModal from './OnboardingModal';
 
 const API_URL = 'https://api.vapi.ai/assistant';
-const REST_API_KEY = '00c60c9f-62b3-4dd3-bede-036242a2b7c5';
+const REST_API_KEY = process.env.REACT_APP_VAPI_API_KEY;
 const PUBLIC_KEY = '1982777e-4159-4b67-981d-4a99ae5faf31';
 
 

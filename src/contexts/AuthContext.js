@@ -48,6 +48,7 @@ export const AuthProvider = ({ children }) => {
             console.error('Error parsing stored agent data:', error);
           }
         }
+        
       } else {
         setUserData(null);
       }
@@ -55,6 +56,7 @@ export const AuthProvider = ({ children }) => {
 
     return unsubscribe;
   }, []);
+
 
   const value = {
     user,

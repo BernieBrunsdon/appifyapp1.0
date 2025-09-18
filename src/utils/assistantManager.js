@@ -1,7 +1,7 @@
 // Client Assistant Manager
 // Handles client-specific assistant creation and management
 
-const VAPI_REST_API_KEY = '00c60c9f-62b3-4dd3-bede-036242a2b7c5';
+const VAPI_REST_API_KEY = process.env.REACT_APP_VAPI_API_KEY;
 const VAPI_BASE_URL = 'https://api.vapi.ai';
 
 export class AssistantManager {

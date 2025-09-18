@@ -266,10 +266,6 @@ export default function Registration({ onRegister, selectedPlan }) {
       // Show onboarding modal for agent setup
       setShowOnboardingModal(true);
       
-      if (onRegister) {
-        onRegister(updatedClientData);
-      }
-      
     } catch (error) {
       console.error('Free plan setup error:', error);
       setErrors({ general: 'Account setup failed. Please try again.' });
@@ -748,7 +744,12 @@ export default function Registration({ onRegister, selectedPlan }) {
       <LoginModal 
         isOpen={showLoginModal} 
         onClose={() => setShowLoginModal(false)} 
-        onLogin={onRegister}
+        onSuccess={(user, userData) => {
+          if (onRegister) {
+            onRegister({ user, userData });
+          }
+          setShowLoginModal(false);
+        }}
       />
       
       {/* Onboarding Modal */}

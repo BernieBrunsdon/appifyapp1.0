@@ -39,7 +39,7 @@ const FAQItem = ({ question, answer }) => {
 // Vapi Configuration
 const VAPI_PUBLIC_KEY = '1982777e-4159-4b67-981d-4a99ae5faf31'; // Updated public key with all assistants permission
 const VAPI_ASSISTANT_ID = '7b950f50-7a8b-4371-a508-acb2d4dd5c7c'; // Use the working dylan assistant ID
-const REST_API_KEY = '00c60c9f-62b3-4dd3-bede-036242a2b7c5';
+const REST_API_KEY = process.env.REACT_APP_VAPI_API_KEY;
 
 const tiers = [
   {
@@ -392,8 +392,20 @@ export default function MarketingPage() {
       <div className="relative z-10">
         {/* Navigation Bar */}
         <header className="absolute top-0 left-0 right-0 z-20 flex justify-between items-center py-6 px-4 md:px-8">
-          <div className="text-3xl font-bold text-white">
-            Appify.AI
+          <div className="flex items-center gap-3">
+            <img 
+              src="/screenshots/appymascot.png.png" 
+              alt="Appy - The Appify AI Mascot" 
+              className="w-10 h-10 object-contain"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
+            />
+            <div className="hidden w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+              Appy
+            </div>
+            <span className="text-3xl font-bold text-white">Appify.AI</span>
           </div>
           <nav className="flex items-center space-x-6">
             <a href="#features" className="text-gray-300 hover:text-white transition">Features</a>
@@ -431,7 +443,24 @@ export default function MarketingPage() {
           <div className="mt-80">
           <h2 className="text-3xl md:text-4xl font-extrabold text-white">Speak to Appy Live</h2>
           <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">Click the button below to start a live voice conversation with our AI assistant. Ask it anything about our services!</p>
-          <div className="mt-12 flex flex-col items-center gap-6">
+          <div className="mt-12 flex flex-col lg:flex-row items-center justify-center gap-8">
+            {/* Appy Mascot - Large version next to mic */}
+            <div className="flex-shrink-0">
+              <img 
+                src="/screenshots/appymascot.png.png" 
+                alt="Appy - The Appify AI Mascot" 
+                className="w-32 h-32 lg:w-40 lg:h-40 object-contain hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div className="hidden w-32 h-32 lg:w-40 lg:h-40 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-4xl font-bold">
+                Appy
+              </div>
+            </div>
+            
+            {/* Microphone Button */}
             <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 flex items-center justify-center">
               {/* Animated rings */}
               <div className="absolute inset-0 rounded-full border-2 border-blue-500/30 animate-pulse"></div>
@@ -1110,7 +1139,21 @@ export default function MarketingPage() {
 
               {/* Company Info */}
               <div className="text-center md:text-left">
-                <h3 className="text-lg font-semibold text-white mb-4">Appify.AI</h3>
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+                  <img 
+                    src="/screenshots/appymascot.png.png" 
+                    alt="Appy - The Appify AI Mascot" 
+                    className="w-12 h-12 object-contain"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <div className="hidden w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                    Appy
+                  </div>
+                  <h3 className="text-lg font-semibold text-white">Appify.AI</h3>
+                </div>
                 <p className="text-gray-300 text-sm leading-relaxed">
                   Intelligent AI receptionist that never sleeps. Answer calls, book appointments, and handle customer inquiries 24/7.
                 </p>

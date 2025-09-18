@@ -27,7 +27,6 @@ export class FirebaseService {
       };
       
       await setDoc(clientRef, clientDoc);
-      console.log('✅ Client created in Firestore:', clientData.id);
       return clientData;
     } catch (error) {
       console.error('❌ Error creating client in Firestore:', error);
@@ -60,7 +59,6 @@ export class FirebaseService {
         ...updateData,
         updatedAt: serverTimestamp()
       });
-      console.log('✅ Client updated in Firestore:', clientId);
     } catch (error) {
       console.error('❌ Error updating client in Firestore:', error);
       throw error;
@@ -78,7 +76,6 @@ export class FirebaseService {
       };
       
       await setDoc(agentRef, agentDoc);
-      console.log('✅ Agent created in Firestore:', agentRef.id);
       return { id: agentRef.id, ...agentDoc };
     } catch (error) {
       console.error('❌ Error creating agent in Firestore:', error);
@@ -120,7 +117,6 @@ export class FirebaseService {
       };
       
       await setDoc(callRef, callDoc);
-      console.log('✅ Call log created in Firestore:', callRef.id);
       return { id: callRef.id, ...callDoc };
     } catch (error) {
       console.error('❌ Error creating call log in Firestore:', error);

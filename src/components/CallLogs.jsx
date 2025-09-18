@@ -38,7 +38,7 @@ const CallLogs = ({ showToast }) => {
       // Get calls from Vapi API
       const response = await fetch(`https://api.vapi.ai/call?assistantId=${agent.vapiAssistantId}`, {
         headers: {
-          'Authorization': `Bearer 00c60c9f-62b3-4dd3-bede-036242a2b7c5`
+          'Authorization': `Bearer ${process.env.REACT_APP_VAPI_API_KEY}`
         }
       });
       

@@ -33,7 +33,6 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
   // Create agent data when modal opens
   useEffect(() => {
     if (isOpen) {
-      console.log('🔍 OnboardingModal VERSION 5.0 - Modal opened, creating agent data...');
       
       // Auto-fill form with default values
       setForm({
@@ -81,20 +80,14 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
       
       
       // Check if clientData is available, fallback to localStorage
-      console.log('🔍 OnboardingModal VERSION 5.0 - Checking client data...');
-      console.log('🔍 OnboardingModal VERSION 5.0 - clientData prop:', clientData);
       
       let currentClientData = clientData;
       if (!currentClientData || !currentClientData.id) {
-        console.log('🔍 OnboardingModal VERSION 3.0 - clientData prop missing, checking localStorage...');
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-        console.log('🔍 OnboardingModal VERSION 3.0 - storedUser from localStorage:', storedUser);
         
         if (storedUser && storedUser.id) {
           currentClientData = storedUser;
-          console.log('🔍 OnboardingModal VERSION 3.0 - Using storedUser as currentClientData:', currentClientData);
         } else {
-          console.log('❌ OnboardingModal VERSION 3.0 - No client data found anywhere!');
           throw new Error('Client data not available. Please try signing up again.');
         }
       }
@@ -120,7 +113,7 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer 00c60c9f-62b3-4dd3-bede-036242a2b7c5`
+            'Authorization': `Bearer ${process.env.REACT_APP_VAPI_API_KEY}`
           },
           body: JSON.stringify({
             name: form.agentName,
@@ -147,10 +140,8 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
           whatsappNumber: '+1 (555) 987-6543',
           voiceNumber: '+1 (555) 456-7890'
         };
-        console.log('✅ Vapi assistant created directly:', result);
       } else {
         result = await response.json();
-        console.log('✅ Backend agent creation successful:', result);
       }
 
       // Create agent data for Firebase
@@ -165,12 +156,9 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
         vapiAssistantId: result.vapiAssistantId
       };
       
-      console.log('🔍 OnboardingModal VERSION 5.0 - Saving agent data to Firebase:', agentData);
-      console.log('🔍 OnboardingModal VERSION 5.0 - Client data:', currentClientData);
       
       // Save agent to Firebase
       const savedAgent = await FirebaseService.createAgent(agentData);
-      console.log('✅ OnboardingModal VERSION 5.0 - Agent saved to Firebase:', savedAgent);
       
       // Also save to localStorage for immediate access
       localStorage.setItem('agentData', JSON.stringify(savedAgent));
