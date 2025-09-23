@@ -61,7 +61,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-64 bg-white/10 backdrop-blur-md border-r border-white/20 text-white flex flex-col h-full">
+    <div className="w-64 bg-white/10 backdrop-blur-md border-r border-cyan-500/20 text-white flex flex-col h-full">
       {/* Logo */}
       <div className="p-6 border-b border-white/20">
         <h1 className="text-2xl font-bold text-white">Appify.AI</h1>
@@ -76,7 +76,7 @@ const Sidebar = () => {
             to={item.href}
             className={`flex items-center px-4 py-3 rounded-lg transition-all duration-300 ${
               isActive(item.href)
-                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
+                ? 'bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white shadow-lg'
                 : 'text-gray-300 hover:bg-white/20 hover:text-white'
             }`}
           >

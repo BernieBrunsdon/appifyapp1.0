@@ -56,15 +56,25 @@ export default function Login({ onLogin }) {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Beautiful Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
-      <div className="absolute inset-0 bg-gradient-to-tr from-pink-900/20 via-purple-900/20 to-blue-900/20"></div>
+      {/* New Hero Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url(/screenshots/newhero.png)'
+        }}
+      ></div>
+      
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 bg-black/60"></div>
+      
+      {/* Subtle color overlay to enhance the image */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-purple-900/30 to-indigo-900/50"></div>
       
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
       </div>
       
       {/* Background Grid */}
@@ -81,12 +91,30 @@ export default function Login({ onLogin }) {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="text-4xl font-bold text-white mb-2">Appify.AI</div>
-            <p className="text-gray-300">Sign in to your account</p>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <img 
+                src="/screenshots/appymascot.png.png" 
+                alt="Appy - The Appify AI Mascot" 
+                className="w-16 h-16 object-contain"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div className="hidden w-16 h-16 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                Appy
+              </div>
+            </div>
+            <div className="text-4xl font-bold text-white mb-2 drop-shadow-lg">
+              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                Appify.AI
+              </span>
+            </div>
+            <p className="text-gray-200">Sign in to your account</p>
           </div>
 
           {/* Login Form */}
-          <div className="bg-gray-800/40 backdrop-blur-lg rounded-2xl p-8 border border-gray-700 shadow-2xl">
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-cyan-500/20 shadow-2xl">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
                 <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
@@ -100,7 +128,7 @@ export default function Login({ onLogin }) {
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({...form, email: e.target.value})}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                   placeholder="Enter your email"
                   required
                 />
@@ -112,7 +140,7 @@ export default function Login({ onLogin }) {
                   type="password"
                   value={form.password}
                   onChange={(e) => setForm({...form, password: e.target.value})}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                   placeholder="Enter your password"
                   required
                 />
@@ -121,7 +149,7 @@ export default function Login({ onLogin }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg text-white font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full py-3 px-4 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 rounded-lg text-white font-semibold hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
@@ -137,7 +165,7 @@ export default function Login({ onLogin }) {
             <div className="mt-6 text-center">
               <p className="text-gray-400 text-sm">
                 Don't have an account?{' '}
-                <a href="/register" className="text-purple-400 hover:text-purple-300 transition">
+                <a href="/register" className="text-cyan-400 hover:text-cyan-300 transition">
                   Sign up here
                 </a>
               </p>

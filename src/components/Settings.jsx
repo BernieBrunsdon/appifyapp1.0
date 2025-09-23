@@ -123,77 +123,80 @@ const Settings = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading settings...</p>
+          <div className="w-8 h-8 border-4 border-cyan-200 border-t-cyan-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white">Loading settings...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900">AI Assistant Settings</h1>
-            <p className="text-slate-600">Configure your voice AI assistant</p>
+    <div className="min-h-screen bg-transparent text-white p-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="bg-white/10 backdrop-blur-lg/10 backdrop-blur-lg rounded-lg border border-cyan-500/20 p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold text-white mb-2">
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                  AI Assistant Settings
+                </span>
+              </h1>
+              <p className="text-gray-200">Configure your voice AI assistant</p>
+            </div>
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="px-6 py-2 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white rounded-lg hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSaving ? 'Saving...' : 'Save Settings'}
+            </button>
           </div>
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSaving ? 'Saving...' : 'Save Settings'}
-          </button>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="p-6 max-w-4xl mx-auto">
         {/* Success Message */}
         {message && (
           <div className={`mb-6 p-4 rounded-lg ${
             message.includes('Error') 
-              ? 'bg-red-50 text-red-700 border border-red-200' 
-              : 'bg-green-50 text-green-700 border border-green-200'
+              ? 'bg-red-500/10 text-red-400 border border-red-500/30' 
+              : 'bg-green-500/10 text-green-400 border border-green-500/30'
           }`}>
             {message}
           </div>
         )}
 
         {/* Basic Settings */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 mb-6">
-          <div className="px-6 py-4 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900">Basic Settings</h2>
-            <p className="text-sm text-slate-600">Configure your assistant's basic behavior</p>
+        <div className="bg-white/10 backdrop-blur-lg/10 backdrop-blur-lg rounded-xl shadow-lg border border-cyan-500/20 mb-6">
+          <div className="px-6 py-4 border-b border-cyan-500/20">
+            <h2 className="text-lg font-semibold text-white">Basic Settings</h2>
+            <p className="text-sm text-gray-200">Configure your assistant's basic behavior</p>
           </div>
           <div className="p-6 space-y-6">
             {/* Assistant Name */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-gray-200 mb-2">
                 Assistant Name
               </label>
               <input
                 type="text"
                 value={settings.assistantName}
                 onChange={(e) => handleInputChange('assistantName', e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-white/10 backdrop-blur-lg/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                 placeholder="My AI Assistant"
               />
             </div>
 
             {/* First Message */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-gray-200 mb-2">
                 First Message
               </label>
               <textarea
                 value={settings.firstMessage}
                 onChange={(e) => handleInputChange('firstMessage', e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                 rows={3}
                 placeholder="Hello! How can I help you today?"
               />
@@ -201,13 +204,13 @@ const Settings = () => {
 
             {/* Voice Selection */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-gray-200 mb-2">
                 Voice
               </label>
               <select
                 value={settings.voice}
                 onChange={(e) => handleInputChange('voice', e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
               >
                 {voiceOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -219,13 +222,13 @@ const Settings = () => {
 
             {/* Model Selection */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-gray-200 mb-2">
                 AI Model
               </label>
               <select
                 value={settings.model}
                 onChange={(e) => handleInputChange('model', e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
               >
                 {modelOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -237,7 +240,7 @@ const Settings = () => {
 
             {/* Temperature */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-gray-200 mb-2">
                 Creativity Level: {settings.temperature}
               </label>
               <input
@@ -247,9 +250,9 @@ const Settings = () => {
                 step="0.1"
                 value={settings.temperature}
                 onChange={(e) => handleInputChange('temperature', parseFloat(e.target.value))}
-                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer"
               />
-              <div className="flex justify-between text-xs text-slate-500 mt-1">
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>Focused</span>
                 <span>Creative</span>
               </div>
@@ -258,16 +261,16 @@ const Settings = () => {
         </div>
 
         {/* Knowledge Base */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-          <div className="px-6 py-4 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900">Knowledge Base</h2>
-            <p className="text-sm text-slate-600">Add information about your business to help your assistant answer questions</p>
+        <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-sm border border-cyan-500/20">
+          <div className="px-6 py-4 border-b border-cyan-500/20">
+            <h2 className="text-lg font-semibold text-white">Knowledge Base</h2>
+            <p className="text-sm text-gray-300">Add information about your business to help your assistant answer questions</p>
           </div>
           <div className="p-6">
             <textarea
               value={settings.knowledgeBase}
               onChange={(e) => handleInputChange('knowledgeBase', e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
               rows={8}
               placeholder="Enter information about your business, products, services, policies, etc. This will help your AI assistant provide accurate and helpful responses to your customers.
 
@@ -278,7 +281,7 @@ Example:
 - Our pricing starts at $99/month
 - We have offices in New York and San Francisco"
             />
-            <div className="mt-2 text-sm text-slate-500">
+            <div className="mt-2 text-sm text-gray-400">
               This information will be added to your assistant's system prompt to help it understand your business better.
             </div>
           </div>

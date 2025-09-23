@@ -3,10 +3,69 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
     <meta name="theme-color" content="#000000" />
-    <meta name="description" content="Web site created using create-react-app" />
+    <meta name="description" content="Appify.AI - Intelligent Voice AI Automation for your business" />
+    <meta name="robots" content="index, follow" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    
+    <!-- Browser compatibility polyfills -->
+    <script>
+      // Polyfill for older browsers
+      if (!window.Promise) {
+        document.write('<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"><\/script>');
+      }
+      if (!window.fetch) {
+        document.write('<script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.6.2/dist/fetch.umd.js"><\/script>');
+      }
+      // Fix for iOS Safari viewport height
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        function setViewportHeight() {
+          document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
+        }
+        setViewportHeight();
+        window.addEventListener('resize', setViewportHeight);
+        window.addEventListener('orientationchange', setViewportHeight);
+      }
+      // Emergency fallback for browser compatibility
+      try {
+        // Check if basic functionality is available
+        if (typeof document === 'undefined' || !document.getElementById) {
+          throw new Error('Basic DOM functionality not available');
+        }
+        
+        // Check for critical browser features
+        var criticalFeatures = [
+          'Promise',
+          'fetch',
+          'Array.from',
+          'Object.assign',
+          'Map',
+          'Set'
+        ];
+        
+        var missingFeatures = criticalFeatures.filter(function(feature) {
+          return !window[feature];
+        });
+        
+        // If too many critical features are missing, show fallback
+        if (missingFeatures.length > 2) {
+          console.error('Critical browser features missing:', missingFeatures);
+          setTimeout(function() {
+            var root = document.getElementById('root');
+            var fallback = document.getElementById('emergency-fallback');
+            if (root && !root.innerHTML.trim() && fallback) {
+              fallback.style.display = 'block';
+              root.style.display = 'none';
+            }
+          }, 5000); // Wait 5 seconds before showing fallback
+        }
+      } catch(e) {
+        console.error('Emergency fallback triggered:', e);
+        // This will only run if there's a critical browser compatibility issue
+      }
+    </script>
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -24,7 +83,36 @@
     <title>Appify.AI - Intelligent Voice AI Automation</title>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif; background: #f0f0f0; color: #333;">
+        <h2>JavaScript Required</h2>
+        <p>You need to enable JavaScript to run Appify.AI. Please enable JavaScript in your browser settings and refresh the page.</p>
+        <p>If you continue to have issues, please contact us at <a href="mailto:bernie@appifyai.com">bernie@appifyai.com</a></p>
+      </div>
+    </noscript>
+    
+    <!-- Emergency fallback for browser compatibility -->
+    <div id="emergency-fallback" style="display: none; padding: 20px; text-align: center; font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; min-height: 100vh;">
+      <div style="max-width: 600px; margin: 0 auto; padding-top: 50px;">
+        <h1 style="color: #4f46e5; margin-bottom: 20px;">Appify.AI</h1>
+        <h2 style="margin-bottom: 20px;">Loading Issues Detected</h2>
+        <p style="margin-bottom: 20px;">We're experiencing compatibility issues with your browser. Please try the following:</p>
+        <ul style="text-align: left; margin-bottom: 30px;">
+          <li>Refresh the page (Ctrl+F5 or Cmd+Shift+R)</li>
+          <li>Clear your browser cache</li>
+          <li>Try a different browser (Chrome, Firefox, Safari)</li>
+          <li>Update your browser to the latest version</li>
+        </ul>
+        <p style="margin-bottom: 30px;">
+          If the problem persists, please contact us at 
+          <a href="mailto:bernie@appifyai.com" style="color: #4f46e5;">bernie@appifyai.com</a>
+        </p>
+        <button onclick="window.location.reload()" style="background: #4f46e5; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+          Refresh Page
+        </button>
+      </div>
+    </div>
+    
     <div id="root"></div>
     <!-- Vapi Web SDK is now loaded via npm package -->
     <!--

@@ -133,24 +133,26 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-gray-300">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <p className="text-white">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="min-h-screen bg-transparent text-white p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            {userData?.agent?.agentName || 'AI Assistant'} Dashboard
+          <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+              {userData?.agent?.agentName || 'AI Assistant'} Dashboard
+            </span>
           </h1>
-          <p className="text-gray-300">
+          <p className="text-gray-200">
             Monitor your AI assistant's performance in real-time.
           </p>
           {userData?.agent && (
@@ -164,14 +166,14 @@ const Dashboard = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 border border-cyan-500/20">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Total Calls</p>
                 <p className="text-2xl font-bold text-white">{stats.totalCalls}</p>
                 <p className="text-green-500 text-xs">+12% vs last week</p>
               </div>
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
@@ -179,14 +181,14 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 border border-cyan-500/20">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Active Calls</p>
                 <p className="text-2xl font-bold text-white">{stats.activeCalls}</p>
                 <p className="text-gray-500 text-xs">Live real-time</p>
               </div>
-              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -194,14 +196,14 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 border border-cyan-500/20">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Success Rate</p>
                 <p className="text-2xl font-bold text-white">{stats.successRate}%</p>
                 <p className="text-green-500 text-xs">+2.1% vs last week</p>
               </div>
-              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -209,14 +211,14 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 border border-cyan-500/20">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Avg Duration</p>
                 <p className="text-2xl font-bold text-white">{stats.avgDuration}m</p>
                 <p className="text-green-500 text-xs">+0.3m vs last week</p>
               </div>
-              <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -226,16 +228,16 @@ const Dashboard = () => {
         </div>
 
         {/* Recent Calls */}
-        <div className="bg-gray-800 rounded-lg border border-gray-700">
-          <div className="p-6 border-b border-gray-700">
+        <div className="bg-white/10 backdrop-blur-lg rounded-lg border border-cyan-500/20">
+          <div className="p-6 border-b border-cyan-500/20">
             <h2 className="text-xl font-semibold text-white mb-2">Recent Calls</h2>
-            <p className="text-gray-400 text-sm">Live call activity and history</p>
+            <p className="text-gray-300 text-sm">Live call activity and history</p>
           </div>
 
           <div className="p-6">
             {recentCalls.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
@@ -246,7 +248,7 @@ const Dashboard = () => {
             ) : (
               <div className="space-y-4">
                 {recentCalls.map((call) => (
-                  <div key={call.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg border border-gray-600">
+                  <div key={call.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-cyan-500/10">
                     <div className="flex items-center space-x-4">
                       <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                       <div>

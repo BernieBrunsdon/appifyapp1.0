@@ -2,6 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Browser compatibility fixes */
+* {
+  box-sizing: border-box;
+}
+
+/* Fix for older browsers that don't support CSS Grid */
+@supports not (display: grid) {
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+/* Fix backdrop-blur for older browsers */
+@supports not (backdrop-filter: blur(10px)) {
+  .backdrop-blur-lg {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+  }
+  .backdrop-blur-md {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+  }
+  .backdrop-blur-sm {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+  }
+}
+
+/* Fix gradient text for older browsers */
+@supports not (background-clip: text) {
+  .bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: white !important; /* Fallback color */
+  }
+}
+
+/* iOS Safari fixes */
+@supports (-webkit-appearance: none) {
+  .ios-fix {
+    -webkit-appearance: none;
+  }
+  
+  /* Fix for iOS Safari viewport height */
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: calc(var(--vh, 1vh) * 100);
+  }
+}
+
+/* Android Chrome fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .android-fix {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
 /* Purple Gradient Background - Matching Marketing Page */
 body {
   margin: 0;
@@ -27,7 +84,7 @@ body {
 }
 
 .animate-scroll {
-  animation: scroll 30s linear infinite;
+  animation: scroll 15s linear infinite;
 }
 
 .fade-in {

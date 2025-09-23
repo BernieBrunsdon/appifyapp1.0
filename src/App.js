@@ -71,7 +71,23 @@ function AppContent() {
     // App subdomain - show app functionality
     return (
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <div className="w-full h-full min-h-screen flex">
+        <div className="w-full h-full min-h-screen flex relative">
+          {/* New Hero Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: 'url(/screenshots/newhero.png)'
+            }}
+          ></div>
+          
+          {/* Dark overlay for readability */}
+          <div className="absolute inset-0 bg-black/60"></div>
+          
+          {/* Subtle color overlay to enhance the image */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-purple-900/30 to-indigo-900/50"></div>
+          
+          {/* Content with relative positioning */}
+          <div className="relative z-10 w-full flex">
           <Routes>
             <Route path="/" element={<Navigate to="/register" />} />
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
@@ -125,8 +141,9 @@ function AppContent() {
               : <Navigate to="/login" />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : isAuthenticatedButUnverified ? '/verify-email' : '/register'} />} />
           </Routes>
+          </div>
           {toast && (
-            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-fade-in">
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-fade-in">
               {toast}
             </div>
           )}

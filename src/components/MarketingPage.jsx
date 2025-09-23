@@ -38,7 +38,7 @@ const FAQItem = ({ question, answer }) => {
 
 // Vapi Configuration
 const VAPI_PUBLIC_KEY = '1982777e-4159-4b67-981d-4a99ae5faf31'; // Updated public key with all assistants permission
-const VAPI_ASSISTANT_ID = '7b950f50-7a8b-4371-a508-acb2d4dd5c7c'; // Use the working dylan assistant ID
+const VAPI_ASSISTANT_ID = '25a2f2c6-d260-4b73-8aa8-9eb6fc481e78'; // Appy AI Assistant ID
 const REST_API_KEY = process.env.REACT_APP_VAPI_API_KEY;
 
 const tiers = [
@@ -367,51 +367,66 @@ export default function MarketingPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Beautiful Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
-      <div className="absolute inset-0 bg-gradient-to-tr from-pink-900/20 via-purple-900/20 to-blue-900/20"></div>
-      
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
-      </div>
-      
-      {/* Background Grid */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: `
-          linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
-        `,
-        backgroundSize: '40px 40px',
-        backgroundPosition: 'center center'
-      }}></div>
+    <div className="min-h-screen">
+      {/* Hero Section with Background Image */}
+      <div className="relative min-h-screen overflow-hidden">
+        {/* New Hero Background Image - Only for hero section */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/screenshots/newhero.png)'
+          }}
+        ></div>
+        
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/40"></div>
+        
+        {/* Subtle color overlay to enhance the image */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 via-purple-900/20 to-indigo-900/40"></div>
+        
+        {/* Bottom fade for seamless transition */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent"></div>
+        
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+        </div>
+        
+        {/* Background Grid */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: `
+            linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px',
+          backgroundPosition: 'center center'
+        }}></div>
 
-      <div className="relative z-10">
+        <div className="relative z-10">
         {/* Navigation Bar */}
         <header className="absolute top-0 left-0 right-0 z-20 flex justify-between items-center py-6 px-4 md:px-8">
           <div className="flex items-center gap-3">
             <img 
               src="/screenshots/appymascot.png.png" 
               alt="Appy - The Appify AI Mascot" 
-              className="w-10 h-10 object-contain"
+              className="w-12 h-12 object-contain"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextSibling.style.display = 'block';
               }}
             />
-            <div className="hidden w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+            <div className="hidden w-12 h-12 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
               Appy
             </div>
-            <span className="text-3xl font-bold text-white">Appify.AI</span>
+            <span className="text-2xl font-bold text-white">Appify.AI</span>
           </div>
           <nav className="flex items-center space-x-6">
             <a href="#features" className="text-gray-300 hover:text-white transition">Features</a>
             <a href="#pricing" className="text-gray-300 hover:text-white transition">Pricing</a>
             <a href="#contact" className="text-gray-300 hover:text-white transition">Contact</a>
-            <a href={getAppUrl("/register")} className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg text-white hover:from-purple-700 hover:to-blue-700 transition font-semibold">
+            <a href={getAppUrl("/register")} className="px-6 py-2 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 rounded-lg text-white hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 transition font-semibold shadow-lg">
               Get Started
             </a>
           </nav>
@@ -419,9 +434,9 @@ export default function MarketingPage() {
 
         {/* Hero Section */}
         <main className="pt-48 pb-16 md:pt-56 md:pb-24 text-center px-4">
-          <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight drop-shadow-lg">
             Automate Your Business with <br /> 
-            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-md">
               Intelligent Voice AI
             </span>
           </h1>
@@ -429,7 +444,7 @@ export default function MarketingPage() {
             We build custom voice AI agents to answer calls, book appointments, and qualify leads, so you can focus on growing your business.
           </p>
           <div className="mt-12 flex flex-col sm:flex-row justify-center items-center gap-6">
-            <a href="https://app.appifyai.com/register" className="w-full sm:w-auto px-10 py-5 text-lg font-semibold text-white rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition transform hover:scale-105">Start Free Trial</a>
+            <a href="https://app.appifyai.com/register" className="w-full sm:w-auto px-10 py-5 text-lg font-semibold text-white rounded-lg bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 transition transform hover:scale-105 shadow-lg">Start Free Trial</a>
             <button onClick={() => setShowDemoModal(true)} className="w-full sm:w-auto px-10 py-5 text-lg font-semibold text-white rounded-lg border-2 border-white/30 hover:bg-white/10 transition transform hover:scale-105">Book A Demo</button>
           </div>
           <div className="mt-8 flex justify-center items-center space-x-2 text-gray-300 text-base">
@@ -449,23 +464,23 @@ export default function MarketingPage() {
               <img 
                 src="/screenshots/appymascot.png.png" 
                 alt="Appy - The Appify AI Mascot" 
-                className="w-32 h-32 lg:w-40 lg:h-40 object-contain hover:scale-105 transition-transform duration-300"
+                className="w-36 h-36 lg:w-44 lg:h-44 object-contain hover:scale-105 transition-transform duration-300"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'block';
                 }}
               />
-              <div className="hidden w-32 h-32 lg:w-40 lg:h-40 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-4xl font-bold">
+              <div className="hidden w-36 h-36 lg:w-44 lg:h-44 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-3xl font-bold">
                 Appy
               </div>
             </div>
             
             {/* Microphone Button */}
-            <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+            <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-indigo-500/20 flex items-center justify-center">
               {/* Animated rings */}
-              <div className="absolute inset-0 rounded-full border-2 border-blue-500/30 animate-pulse"></div>
-              <div className="absolute inset-0 rounded-full border-2 border-purple-500/30 animate-pulse" style={{animationDelay: '1s'}}></div>
-              <div className="absolute inset-0 rounded-full border-2 border-green-500/30 animate-pulse" style={{animationDelay: '2s'}}></div>
+              <div className="absolute inset-0 rounded-full border-2 border-cyan-500/30 animate-pulse"></div>
+              <div className="absolute inset-0 rounded-full border-2 border-blue-500/30 animate-pulse" style={{animationDelay: '1s'}}></div>
+              <div className="absolute inset-0 rounded-full border-2 border-indigo-500/30 animate-pulse" style={{animationDelay: '2s'}}></div>
               
               {/* Main button */}
               <button 
@@ -476,7 +491,7 @@ export default function MarketingPage() {
                     ? 'bg-red-500/80 border-2 border-red-400 hover:bg-red-600/80 animate-pulse' 
                     : callStatus === 'starting'
                     ? 'bg-yellow-500/80 border-2 border-yellow-400 animate-pulse'
-                    : 'bg-gray-800/60 border-2 border-gray-600 hover:border-purple-500 hover:scale-105'
+                    : 'bg-gray-800/60 border-2 border-gray-600 hover:border-cyan-500 hover:scale-105'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {callStatus === 'in-call' ? (
@@ -523,7 +538,58 @@ export default function MarketingPage() {
           </div>
           </div>
         </main>
+        </div>
+      </div>
 
+      {/* Rest of the page with seamless background continuation */}
+      <div className="relative">
+        {/* Seamless background continuation from hero section */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Extended hero background image - blurred and dimmed for seamless continuation */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: 'url(/screenshots/newhero.png)',
+              filter: 'blur(2px) brightness(0.3)',
+              transform: 'scale(1.1)'
+            }}
+          ></div>
+          
+          {/* Gradient overlay to create seamless transition */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/40 to-slate-900/80"></div>
+          
+          {/* Additional gradient for depth */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 via-purple-900/20 to-indigo-900/40"></div>
+          
+          {/* Subtle grid pattern - same as hero section */}
+          <div className="absolute inset-0 opacity-15" style={{
+            backgroundImage: `
+              linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+            backgroundPosition: 'center center'
+          }}></div>
+
+          {/* Extended animated glowing orbs - continuing from hero section */}
+          <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-cyan-500/20 to-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-1/4 -left-32 w-80 h-80 bg-gradient-to-br from-blue-500/15 to-indigo-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-gradient-to-br from-cyan-500/15 to-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute bottom-10 left-1/3 w-56 h-56 bg-gradient-to-br from-blue-500/10 to-indigo-500/8 rounded-full blur-3xl animate-pulse" style={{animationDelay: '3s'}}></div>
+          
+          {/* Additional orbs for more seamless coverage */}
+          <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-gradient-to-br from-purple-500/8 to-indigo-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2.5s'}}></div>
+          <div className="absolute bottom-1/3 left-1/4 w-60 h-60 bg-gradient-to-br from-cyan-500/12 to-blue-500/8 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
+
+          {/* Subtle light rays - continuing from hero */}
+          <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent"></div>
+          <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-blue-500/10 to-transparent"></div>
+          <div className="absolute top-0 left-2/3 w-px h-full bg-gradient-to-b from-transparent via-indigo-500/8 to-transparent"></div>
+        </div>
+        
+        {/* Content with relative positioning */}
+        <div className="relative z-10">
         {/* AI Agent Chat Section */}
         <section id="ai-agent" className="py-10 md:py-16 px-4">
           <div className="max-w-3xl mx-auto text-center">
@@ -584,6 +650,187 @@ export default function MarketingPage() {
                 </button>
               </form>
             </div>
+          </div>
+        </section>
+
+        {/* Integrations Section */}
+        <section className="py-16 md:py-20 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">Integrations</span>
+              </h2>
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+                Integrate with more than 40+ apps in a snap
+              </p>
+            </div>
+            
+            {/* Integrations Carousel */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-800/30 via-gray-700/20 to-gray-800/30 border border-cyan-500/20 p-8">
+              {/* Gradient overlays for smooth scroll effect */}
+              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-900/40 to-transparent z-10"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-900/40 to-transparent z-10"></div>
+              
+              {/* Scrolling integrations grid */}
+              <div className="flex animate-scroll space-x-8">
+                {/* First set of integrations */}
+                <div className="flex space-x-12 flex-shrink-0">
+                  {/* Vapi */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/vapi.ai" alt="Vapi" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* OpenAI */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/openai.com" alt="OpenAI" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Google Calendar */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Calendar_icon_%282020%29.svg/64px-Google_Calendar_icon_%282020%29.svg.png" alt="Google Calendar" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* HubSpot */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/hubspot.com" alt="HubSpot" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Salesforce */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/64px-Salesforce.com_logo.svg.png" alt="Salesforce" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Zoom */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/64px-Zoom_Communications_Logo.svg.png" alt="Zoom" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Notion */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Notion_app_logo.png/64px-Notion_app_logo.png" alt="Notion" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Zapier */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/zapier.com" alt="Zapier" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Microsoft Azure */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Microsoft_Azure.svg/64px-Microsoft_Azure.svg.png" alt="Microsoft Azure" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* AWS */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/64px-Amazon_Web_Services_Logo.svg.png" alt="AWS" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Google Cloud */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/cloud.google.com" alt="Google Cloud" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Slack */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Stripe */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/stripe.com" alt="Stripe" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Twilio */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/twilio.com" alt="Twilio" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* WhatsApp */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/whatsapp.com" alt="WhatsApp" className="w-16 h-16 object-contain" />
+                  </div>
+                </div>
+                
+                {/* Second set of integrations (duplicate for seamless loop) */}
+                <div className="flex space-x-12 flex-shrink-0">
+                  {/* Vapi */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/vapi.ai" alt="Vapi" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* OpenAI */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/openai.com" alt="OpenAI" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Google Calendar */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Calendar_icon_%282020%29.svg/64px-Google_Calendar_icon_%282020%29.svg.png" alt="Google Calendar" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* HubSpot */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/hubspot.com" alt="HubSpot" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Salesforce */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/64px-Salesforce.com_logo.svg.png" alt="Salesforce" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Zoom */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/64px-Zoom_Communications_Logo.svg.png" alt="Zoom" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Notion */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Notion_app_logo.png/64px-Notion_app_logo.png" alt="Notion" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Zapier */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/zapier.com" alt="Zapier" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Microsoft Azure */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Microsoft_Azure.svg/64px-Microsoft_Azure.svg.png" alt="Microsoft Azure" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* AWS */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/64px-Amazon_Web_Services_Logo.svg.png" alt="AWS" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Google Cloud */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/cloud.google.com" alt="Google Cloud" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Slack */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Stripe */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/stripe.com" alt="Stripe" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Twilio */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/twilio.com" alt="Twilio" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* WhatsApp */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/whatsapp.com" alt="WhatsApp" className="w-16 h-16 object-contain" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
           </div>
         </section>
 
@@ -1143,16 +1390,16 @@ export default function MarketingPage() {
                   <img 
                     src="/screenshots/appymascot.png.png" 
                     alt="Appy - The Appify AI Mascot" 
-                    className="w-12 h-12 object-contain"
+                    className="w-14 h-14 object-contain"
                     onError={(e) => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'block';
                     }}
                   />
-                  <div className="hidden w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                  <div className="hidden w-14 h-14 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-base font-bold">
                     Appy
                   </div>
-                  <h3 className="text-lg font-semibold text-white">Appify.AI</h3>
+                  <h3 className="text-base font-semibold text-white">Appify.AI</h3>
                 </div>
                 <p className="text-gray-300 text-sm leading-relaxed">
                   Intelligent AI receptionist that never sleeps. Answer calls, book appointments, and handle customer inquiries 24/7.
@@ -1165,6 +1412,7 @@ export default function MarketingPage() {
             </div>
           </div>
         </footer>
+        </div>
       </div>
       
       {/* Demo Booking Modal */}

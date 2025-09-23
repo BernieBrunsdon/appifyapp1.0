@@ -10,25 +10,25 @@ const Header = ({ brand, darkMode, setDarkMode, authed, onLogout }) => {
         <img 
           src="/screenshots/appymascot.png.png" 
           alt="Appy - The Appify AI Mascot" 
-          className="w-10 h-10 object-contain"
+          className="w-12 h-12 object-contain"
           onError={(e) => {
             e.target.style.display = 'none';
             e.target.nextSibling.style.display = 'block';
           }}
         />
-        <div className="hidden w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+        <div className="hidden w-12 h-12 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
           Appy
         </div>
-        <span className="text-2xl font-bold tracking-tight text-white drop-shadow">Appify Voice Agents</span>
+        <span className="text-xl font-bold tracking-tight text-white drop-shadow">Appify Voice Agents</span>
       </div>
       <nav className="flex items-center gap-4">
         {location.pathname.startsWith('/app') && (
-          <Link to="/" className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow transition-colors">Back to Marketing Site</Link>
+          <Link to="/" className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold shadow-lg transition-all duration-300">Back to Marketing Site</Link>
         )}
         {authed && (
           <>
-            <Link to="/app" className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 ${location.pathname === '/app' ? 'bg-blue-500 text-white' : 'text-gray-200 hover:bg-gray-700'}`}>Voice Agent</Link>
-            <Link to="/app/logs" className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 ${location.pathname === '/app' ? 'bg-blue-500 text-white' : 'text-gray-200 hover:bg-gray-700'}`}>Call Logs</Link>
+            <Link to="/app" className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 ${location.pathname === '/app' ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg' : 'text-gray-200 hover:bg-white/20'}`}>Voice Agent</Link>
+            <Link to="/app/logs" className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 ${location.pathname === '/app' ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg' : 'text-gray-200 hover:bg-white/20'}`}>Call Logs</Link>
           </>
         )}
         {authed && (
