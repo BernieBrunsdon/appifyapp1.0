@@ -653,187 +653,6 @@ export default function MarketingPage() {
           </div>
         </section>
 
-        {/* Integrations Section */}
-        <section className="py-16 md:py-20 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
-                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">Integrations</span>
-              </h2>
-              <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                Integrate with more than 40+ apps in a snap
-              </p>
-            </div>
-            
-            {/* Integrations Carousel */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-800/30 via-gray-700/20 to-gray-800/30 border border-cyan-500/20 p-8">
-              {/* Gradient overlays for smooth scroll effect */}
-              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-900/40 to-transparent z-10"></div>
-              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-900/40 to-transparent z-10"></div>
-              
-              {/* Scrolling integrations grid */}
-              <div className="flex animate-scroll space-x-8">
-                {/* First set of integrations */}
-                <div className="flex space-x-12 flex-shrink-0">
-                  {/* Vapi */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/vapi.ai" alt="Vapi" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* OpenAI */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/openai.com" alt="OpenAI" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Google Calendar */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Calendar_icon_%282020%29.svg/64px-Google_Calendar_icon_%282020%29.svg.png" alt="Google Calendar" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* HubSpot */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/hubspot.com" alt="HubSpot" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Salesforce */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/64px-Salesforce.com_logo.svg.png" alt="Salesforce" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Zoom */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/64px-Zoom_Communications_Logo.svg.png" alt="Zoom" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Notion */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Notion_app_logo.png/64px-Notion_app_logo.png" alt="Notion" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Zapier */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/zapier.com" alt="Zapier" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Microsoft Azure */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Microsoft_Azure.svg/64px-Microsoft_Azure.svg.png" alt="Microsoft Azure" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* AWS */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/64px-Amazon_Web_Services_Logo.svg.png" alt="AWS" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Google Cloud */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/cloud.google.com" alt="Google Cloud" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Slack */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Stripe */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/stripe.com" alt="Stripe" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Twilio */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/twilio.com" alt="Twilio" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* WhatsApp */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/whatsapp.com" alt="WhatsApp" className="w-16 h-16 object-contain" />
-                  </div>
-                </div>
-                
-                {/* Second set of integrations (duplicate for seamless loop) */}
-                <div className="flex space-x-12 flex-shrink-0">
-                  {/* Vapi */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/vapi.ai" alt="Vapi" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* OpenAI */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/openai.com" alt="OpenAI" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Google Calendar */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Calendar_icon_%282020%29.svg/64px-Google_Calendar_icon_%282020%29.svg.png" alt="Google Calendar" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* HubSpot */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/hubspot.com" alt="HubSpot" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Salesforce */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/64px-Salesforce.com_logo.svg.png" alt="Salesforce" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Zoom */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/64px-Zoom_Communications_Logo.svg.png" alt="Zoom" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Notion */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Notion_app_logo.png/64px-Notion_app_logo.png" alt="Notion" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Zapier */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/zapier.com" alt="Zapier" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Microsoft Azure */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Microsoft_Azure.svg/64px-Microsoft_Azure.svg.png" alt="Microsoft Azure" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* AWS */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/64px-Amazon_Web_Services_Logo.svg.png" alt="AWS" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Google Cloud */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/cloud.google.com" alt="Google Cloud" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Slack */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Stripe */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/stripe.com" alt="Stripe" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Twilio */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/twilio.com" alt="Twilio" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* WhatsApp */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/whatsapp.com" alt="WhatsApp" className="w-16 h-16 object-contain" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </div>
-        </section>
-
         {/* AI Solutions Section - Revamped with App Screenshots */}
         <section id="features" className="py-20 md:py-24 px-4">
           <div className="max-w-7xl mx-auto">
@@ -1070,9 +889,191 @@ export default function MarketingPage() {
                   Book Demo
                 </button>
               </div>
-      </div>
+            </div>
           </div>
-      </section>
+        </section>
+
+        {/* Integrations Section */}
+        <section className="py-16 md:py-20 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">Integrations</span>
+              </h2>
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+                Integrate with more than 40+ apps in a snap
+              </p>
+            </div>
+            
+            {/* Integrations Carousel */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-800/30 via-gray-700/20 to-gray-800/30 border border-cyan-500/20 p-8">
+              {/* Gradient overlays for smooth scroll effect */}
+              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-900/40 to-transparent z-10"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-900/40 to-transparent z-10"></div>
+              
+              {/* Scrolling integrations grid */}
+              <div className="flex animate-scroll space-x-8">
+                {/* First set of integrations */}
+                <div className="flex space-x-12 flex-shrink-0">
+                  {/* Vapi */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/vapi.ai" alt="Vapi" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* OpenAI */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/openai.com" alt="OpenAI" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Google Calendar */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Calendar_icon_%282020%29.svg/64px-Google_Calendar_icon_%282020%29.svg.png" alt="Google Calendar" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* HubSpot */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/hubspot.com" alt="HubSpot" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Salesforce */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/64px-Salesforce.com_logo.svg.png" alt="Salesforce" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Zoom */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/64px-Zoom_Communications_Logo.svg.png" alt="Zoom" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Notion */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Notion_app_logo.png/64px-Notion_app_logo.png" alt="Notion" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Zapier */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/zapier.com" alt="Zapier" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Microsoft Azure */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Microsoft_Azure.svg/64px-Microsoft_Azure.svg.png" alt="Microsoft Azure" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* AWS */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/64px-Amazon_Web_Services_Logo.svg.png" alt="AWS" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Google Cloud */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/cloud.google.com" alt="Google Cloud" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Slack */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Stripe */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/stripe.com" alt="Stripe" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Twilio */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/twilio.com" alt="Twilio" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* WhatsApp */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/whatsapp.com" alt="WhatsApp" className="w-16 h-16 object-contain" />
+                  </div>
+                </div>
+                
+                {/* Second set of integrations (duplicate for seamless loop) */}
+                <div className="flex space-x-12 flex-shrink-0">
+                  {/* Vapi */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/vapi.ai" alt="Vapi" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* OpenAI */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/openai.com" alt="OpenAI" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Google Calendar */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Calendar_icon_%282020%29.svg/64px-Google_Calendar_icon_%282020%29.svg.png" alt="Google Calendar" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* HubSpot */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/hubspot.com" alt="HubSpot" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Salesforce */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/64px-Salesforce.com_logo.svg.png" alt="Salesforce" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Zoom */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/64px-Zoom_Communications_Logo.svg.png" alt="Zoom" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Notion */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Notion_app_logo.png/64px-Notion_app_logo.png" alt="Notion" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Zapier */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/zapier.com" alt="Zapier" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Microsoft Azure */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Microsoft_Azure.svg/64px-Microsoft_Azure.svg.png" alt="Microsoft Azure" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* AWS */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/64px-Amazon_Web_Services_Logo.svg.png" alt="AWS" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Google Cloud */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/cloud.google.com" alt="Google Cloud" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Slack */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Stripe */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/stripe.com" alt="Stripe" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* Twilio */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/twilio.com" alt="Twilio" className="w-16 h-16 object-contain" />
+                  </div>
+                  
+                  {/* WhatsApp */}
+                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
+                    <img src="https://logo.clearbit.com/whatsapp.com" alt="WhatsApp" className="w-16 h-16 object-contain" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </section>
+
 
         {/* Trusted by Leading Brands Section - COMMENTED OUT FOR NOW */}
         {/* 

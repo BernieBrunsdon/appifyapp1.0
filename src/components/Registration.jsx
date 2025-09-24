@@ -712,6 +712,15 @@ export default function Registration({ onRegister, selectedPlan }) {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      {/* New Hero Background Image with High Opacity */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url(/screenshots/newhero.png)',
+          opacity: 0.15
+        }}
+      ></div>
+      
       {/* Enhanced Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
       <div className="absolute inset-0 bg-gradient-to-tr from-pink-900/20 via-purple-900/20 to-blue-900/20"></div>
