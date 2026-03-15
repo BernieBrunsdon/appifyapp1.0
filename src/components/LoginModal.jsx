@@ -145,7 +145,7 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white"
                 placeholder="Enter your email"
               />
             </div>
@@ -162,7 +162,7 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white"
                   placeholder="Enter your password"
                 />
                 <button
@@ -216,7 +216,7 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
                 value={resetEmail}
                 onChange={(e) => setResetEmail(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white"
                 placeholder="Enter your email"
               />
             </div>
