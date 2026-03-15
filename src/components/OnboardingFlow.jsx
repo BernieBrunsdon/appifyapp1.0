@@ -1,406 +1,284 @@
-import React, { useState } from 'react';
-import { FirebaseService } from '../services/firebaseService';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../utils/api';
+import BackToMarketing from './BackToMarketing';
+import { clientHasDemoAgent } from '../utils/onboardingGate';
+import { auth } from '../firebase/config';
 
-const API_URL = 'https://api.vapi.ai/assistant';
-const REST_API_KEY = '00c60c9f-62b3-4dd3-bede-036242a2b7c5';
+const TEMPLATES = [
+  { id: 'receptionist', label: 'AI Receptionist', emoji: '📞' },
+  { id: 'lead_qual', label: 'Lead Qualification Agent', emoji: '🎯' },
+  { id: 'appointment', label: 'Appointment Booking Agent', emoji: '📅' },
+  { id: 'support', label: 'Customer Support Agent', emoji: '💬' },
+  { id: 'service_business', label: 'Service Business Assistant', emoji: '🔧' },
+  { id: 'custom', label: 'Custom Business Assistant', emoji: '✨' }
+];
 
-const OnboardingFlow = ({ onComplete }) => {
+const VOICE_OPTIONS = [
+  { value: 'alloy', label: 'Alloy (Neutral)' },
+  { value: 'echo', label: 'Echo' },
+  { value: 'fable', label: 'Fable' },
+  { value: 'onyx', label: 'Onyx' },
+  { value: 'nova', label: 'Nova' },
+  { value: 'shimmer', label: 'Shimmer' }
+];
+
+export default function OnboardingFlow({ onComplete }) {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [checking, setChecking] = useState(true);
+  const [form, setForm] = useState({
+    templateId: 'receptionist',
+    businessName: '',
     agentName: '',
-    openingLine: '',
-    voice: 'alloy',
-    knowledgeBase: '',
     businessDescription: '',
-    dosAndDonts: '',
-    customPrompt: ''
+    servicesOffered: '',
+    businessHours: '',
+    contactEmail: '',
+    notes: '',
+    voice: 'alloy'
   });
 
   const totalSteps = 4;
 
-  // Voice options
-  const voiceOptions = [
-    { value: 'alloy', label: 'Alloy (Neutral)', description: 'Balanced and professional' },
-    { value: 'echo', label: 'Echo (Male)', description: 'Confident and authoritative' },
-    { value: 'fable', label: 'Fable (British)', description: 'Sophisticated and charming' },
-    { value: 'onyx', label: 'Onyx (Deep)', description: 'Warm and trustworthy' },
-    { value: 'nova', label: 'Nova (Female)', description: 'Friendly and approachable' },
-    { value: 'shimmer', label: 'Shimmer (Soft)', description: 'Gentle and calming' }
-  ];
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const uid = auth.currentUser?.uid;
+        if (uid && (await clientHasDemoAgent(uid))) {
+          if (!cancelled) navigate('/dashboard', { replace: true });
+          return;
+        }
+        const me = await api('/api/onboarding/me');
+        if (cancelled) return;
+        if (me.demo_assistant_id || me.onboardingStage === 'demo_ready' || me.onboardingStage === 'build_requested') {
+          navigate('/dashboard', { replace: true });
+          return;
+        }
+      } catch {
+        /* API 404 / offline — stay on onboarding or already redirected via Firestore */
+      } finally {
+        if (!cancelled) setChecking(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [navigate]);
 
-  // Pre-defined opening lines
-  const openingLineOptions = [
-    `Hello! I'm ${formData.agentName || 'your AI assistant'}, how can I help you today?`,
-    `Hi there! I'm ${formData.agentName || 'your AI assistant'}, what can I do for you?`,
-    `Good day! I'm ${formData.agentName || 'your AI assistant'}, how may I assist you?`,
-    `Welcome! I'm ${formData.agentName || 'your AI assistant'}, what brings you here today?`,
-    `Hello! I'm ${formData.agentName || 'your AI assistant'}, ready to help with whatever you need!`
-  ];
+  const update = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
-  const updateFormData = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const next = () => currentStep < totalSteps && setCurrentStep((s) => s + 1);
+  const prev = () => currentStep > 1 && setCurrentStep((s) => s - 1);
+
+  const canNext = () => {
+    if (currentStep === 1) return !!form.templateId;
+    if (currentStep === 2)
+      return (
+        form.businessName.trim() &&
+        form.agentName.trim() &&
+        form.businessDescription.trim()
+      );
+    if (currentStep === 3) return !!form.voice;
+    return true;
   };
 
-  const nextStep = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleComplete = async () => {
+  const handleCreate = async () => {
     setLoading(true);
     try {
-      console.log('🚀 Creating assistant with data:', formData);
-
-      // Create Vapi assistant
-      const assistantConfig = {
-        name: formData.agentName,
-        model: {
-          provider: 'openai',
-          model: 'gpt-4',
-          temperature: 0.7,
-          maxTokens: 1000,
-          messages: [
-            {
-              role: 'system',
-              content: `You are ${formData.agentName}, an AI assistant.
-
-Business Description: ${formData.businessDescription}
-
-Knowledge Base: ${formData.knowledgeBase}
-
-Guidelines:
-- ${formData.dosAndDonts}
-
-${formData.customPrompt ? `Additional Instructions: ${formData.customPrompt}` : ''}
-
-Always be helpful, professional, and stay in character as ${formData.agentName}.`
-            }
-          ]
-        },
-        voice: {
-          provider: 'openai',
-          voiceId: formData.voice
-        },
-        firstMessage: formData.openingLine,
-        maxDurationSeconds: 300
-      };
-
-      console.log('🔧 Sending Vapi request:', assistantConfig);
-
-      const vapiResponse = await fetch(API_URL, {
+      const res = await api('/api/onboarding/demo-assistant', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${REST_API_KEY}`
-        },
-        body: JSON.stringify(assistantConfig)
+        body: JSON.stringify({
+          templateId: form.templateId,
+          businessName: form.businessName,
+          agentName: form.agentName,
+          businessDescription: form.businessDescription,
+          servicesOffered: form.servicesOffered,
+          businessHours: form.businessHours,
+          contactEmail: form.contactEmail,
+          notes: form.notes,
+          voice: form.voice
+        })
       });
-
-      if (!vapiResponse.ok) {
-        const errorData = await vapiResponse.json().catch(() => ({}));
-        console.error('❌ Vapi API Error:', errorData);
-        throw new Error(`Failed to create Vapi assistant: ${errorData.message || vapiResponse.statusText}`);
-      }
-
-      const vapiAssistant = await vapiResponse.json();
-      console.log('✅ Vapi assistant created:', vapiAssistant);
-
-      // Create agent data for Firebase
-      const agentData = {
-        agentName: formData.agentName,
-        firstMessage: formData.openingLine,
-        agentVoice: formData.voice,
-        systemPrompt: `You are ${formData.agentName}, an AI assistant. 
-
-Business Description: ${formData.businessDescription}
-
-Knowledge Base: ${formData.knowledgeBase}
-
-Guidelines:
-- ${formData.dosAndDonts}
-
-${formData.customPrompt ? `Additional Instructions: ${formData.customPrompt}` : ''}
-
-Always be helpful, professional, and stay in character as ${formData.agentName}.`,
-        vapiAssistantId: vapiAssistant.id,
-        assignedPhoneNumber: '+1 (555) 123-4567',
-        whatsappNumber: '+1 (555) 987-6543',
-        createdAt: new Date().toISOString()
-      };
-
-      // Save to Firebase
-      const savedAgent = await FirebaseService.createAgent(agentData);
-      console.log('✅ Agent saved to Firebase:', savedAgent);
-
-      // Save to localStorage
-      localStorage.setItem('agentData', JSON.stringify(savedAgent));
-
-      // Update user data
-      const userData = JSON.parse(localStorage.getItem('user') || '{}');
-      const updatedUserData = {
-        ...userData,
-        agent: savedAgent
-      };
-      localStorage.setItem('user', JSON.stringify(updatedUserData));
-
-      // Complete onboarding
-      onComplete(savedAgent);
-
-    } catch (error) {
-      console.error('❌ Error creating assistant:', error);
-      alert('Failed to create assistant. Please try again.');
+      const agent = res.agent;
+      localStorage.setItem('agentData', JSON.stringify(agent));
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      localStorage.setItem('user', JSON.stringify({ ...user, agent }));
+      onComplete?.(agent);
+      navigate('/dashboard', { replace: true });
+    } catch (e) {
+      console.error(e);
+      alert(e.message || 'Could not create demo agent. Is the API server running with VAPI_API_KEY?');
     } finally {
       setLoading(false);
     }
   };
 
-  const renderStep = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="text-center">
-            <div className="text-6xl mb-6">🤖</div>
-            <h2 className="text-3xl font-bold text-white mb-4">Let's create your AI assistant!</h2>
-            <p className="text-gray-300 mb-8">First, let's give your assistant a name</p>
-            
-            <div className="max-w-md mx-auto">
-              <input
-                type="text"
-                value={formData.agentName}
-                onChange={(e) => updateFormData('agentName', e.target.value)}
-                placeholder="Enter assistant name (e.g., Sarah, Alex, Max)"
-                className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 text-lg"
-              />
-              <p className="text-gray-400 text-sm mt-2">This will be how your assistant introduces itself</p>
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="text-center">
-            <div className="text-6xl mb-6">💬</div>
-            <h2 className="text-3xl font-bold text-white mb-4">Choose an opening line</h2>
-            <p className="text-gray-300 mb-8">How should {formData.agentName || 'your assistant'} greet customers?</p>
-            
-            <div className="max-w-2xl mx-auto space-y-4">
-              {openingLineOptions.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => updateFormData('openingLine', option)}
-                  className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                    formData.openingLine === option
-                      ? 'border-purple-500 bg-purple-500/20 text-white'
-                      : 'border-white/20 bg-white/5 text-gray-300 hover:border-white/40 hover:bg-white/10'
-                  }`}
-                >
-                  <div className="font-medium">{option}</div>
-                </button>
-              ))}
-              
-              <div className="mt-6">
-                <input
-                  type="text"
-                  value={formData.openingLine}
-                  onChange={(e) => updateFormData('openingLine', e.target.value)}
-                  placeholder="Or write your own custom opening line..."
-                  className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="text-center">
-            <div className="text-6xl mb-6">🎤</div>
-            <h2 className="text-3xl font-bold text-white mb-4">Select a voice</h2>
-            <p className="text-gray-300 mb-8">Choose the voice that best represents {formData.agentName || 'your assistant'}</p>
-            
-            <div className="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
-              {voiceOptions.map((voice) => (
-                <button
-                  key={voice.value}
-                  onClick={() => updateFormData('voice', voice.value)}
-                  className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                    formData.voice === voice.value
-                      ? 'border-purple-500 bg-purple-500/20 text-white'
-                      : 'border-white/20 bg-white/5 text-gray-300 hover:border-white/40 hover:bg-white/10'
-                  }`}
-                >
-                  <div className="font-medium text-lg">{voice.label}</div>
-                  <div className="text-sm opacity-75">{voice.description}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="text-center">
-            <div className="text-6xl mb-6">🧠</div>
-            <h2 className="text-3xl font-bold text-white mb-4">Build your assistant's knowledge</h2>
-            <p className="text-gray-300 mb-8">Help {formData.agentName || 'your assistant'} understand your business</p>
-            
-            <div className="max-w-4xl mx-auto space-y-6">
-              <div>
-                <label className="block text-white font-medium mb-3 text-left">What does your business do?</label>
-                <textarea
-                  value={formData.businessDescription}
-                  onChange={(e) => updateFormData('businessDescription', e.target.value)}
-                  placeholder="Describe your business, services, products, and what makes you unique..."
-                  rows={4}
-                  className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 resize-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-white font-medium mb-3 text-left">Knowledge Base & Expertise</label>
-                <textarea
-                  value={formData.knowledgeBase}
-                  onChange={(e) => updateFormData('knowledgeBase', e.target.value)}
-                  placeholder="What specific knowledge should your assistant have? (products, pricing, policies, procedures, etc.)"
-                  rows={4}
-                  className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 resize-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-white font-medium mb-3 text-left">Do's and Don'ts</label>
-                <textarea
-                  value={formData.dosAndDonts}
-                  onChange={(e) => updateFormData('dosAndDonts', e.target.value)}
-                  placeholder="How should your assistant behave? What should it always do? What should it never do? (e.g., Always be polite, Never make promises about pricing, Always ask for contact info for complex issues)"
-                  rows={4}
-                  className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 resize-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-white font-medium mb-3 text-left">Additional Instructions (Optional)</label>
-                <textarea
-                  value={formData.customPrompt}
-                  onChange={(e) => updateFormData('customPrompt', e.target.value)}
-                  placeholder="Any specific instructions, personality traits, or special behaviors for your assistant?"
-                  rows={3}
-                  className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 resize-none"
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  const canProceed = () => {
-    switch (currentStep) {
-      case 1:
-        return formData.agentName.trim().length > 0;
-      case 2:
-        return formData.openingLine.trim().length > 0;
-      case 3:
-        return formData.voice.length > 0;
-      case 4:
-        return formData.businessDescription.trim().length > 0 && 
-               formData.knowledgeBase.trim().length > 0 && 
-               formData.dosAndDonts.trim().length > 0;
-      default:
-        return false;
-    }
-  };
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white bg-gray-900">
+        Loading…
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4">
-      {/* New Hero Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: 'url(/screenshots/newhero.png)'
-        }}
-      ></div>
-      
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-black/60"></div>
-      
-      {/* Subtle color overlay to enhance the image */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-purple-900/30 to-indigo-900/50"></div>
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4 py-8">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: 'url(/screenshots/newhero.png)' }}
+      />
+      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-purple-900/30 to-indigo-900/50" />
+
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+        <BackToMarketing className="px-3 py-2 rounded-lg bg-black/30 backdrop-blur-sm border border-white/10 hover:bg-white/10" />
       </div>
 
-      <div className="relative z-10 w-full max-w-4xl">
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-white font-medium">Step {currentStep} of {totalSteps}</span>
-            <span className="text-gray-300">{Math.round((currentStep / totalSteps) * 100)}% Complete</span>
+      <div className="relative z-10 w-full max-w-3xl">
+        <div className="mb-6">
+          <div className="flex justify-between text-white text-sm mb-2">
+            <span>Step {currentStep} of {totalSteps}</span>
+            <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
           </div>
-          <div className="w-full bg-white/20 rounded-full h-2">
-            <div 
-              className="bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
+          <div className="h-2 bg-white/20 rounded-full">
+            <div
+              className="h-2 rounded-full bg-gradient-to-r from-cyan-500 to-indigo-500 transition-all"
               style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-            ></div>
+            />
           </div>
         </div>
 
-        {/* Step Content */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-cyan-500/20 shadow-2xl">
-          {renderStep()}
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-cyan-500/20">
+          {currentStep === 1 && (
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-2">Choose a template</h2>
+              <p className="text-gray-300 mb-6">Starts your demo agent with the right tone.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => update('templateId', t.id)}
+                    className={`p-4 rounded-xl border-2 text-left transition ${
+                      form.templateId === t.id
+                        ? 'border-purple-500 bg-purple-500/20 text-white'
+                        : 'border-white/20 bg-white/5 text-gray-200 hover:border-white/40'
+                    }`}
+                  >
+                    <span className="text-2xl mr-2">{t.emoji}</span>
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 2 && (
+            <div className="space-y-4 text-left">
+              <h2 className="text-2xl font-bold text-white">Business setup</h2>
+              {[
+                ['businessName', 'Business name', 'text', true],
+                ['agentName', 'Agent name (how they introduce themselves)', 'text', true],
+                ['businessDescription', 'Business description', 'textarea', true],
+                ['servicesOffered', 'Services offered', 'textarea', false],
+                ['businessHours', 'Business hours', 'text', false],
+                ['contactEmail', 'Contact email', 'email', false],
+                ['notes', 'Notes (optional)', 'textarea', false]
+              ].map(([key, label, type, req]) =>
+                type === 'textarea' ? (
+                  <div key={key}>
+                    <label className="text-gray-200 text-sm block mb-1">{label}</label>
+                    <textarea
+                      value={form[key]}
+                      onChange={(e) => update(key, e.target.value)}
+                      rows={key === 'businessDescription' ? 4 : 2}
+                      className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-500"
+                      placeholder={req ? 'Required' : 'Optional'}
+                    />
+                  </div>
+                ) : (
+                  <div key={key}>
+                    <label className="text-gray-200 text-sm block mb-1">{label}</label>
+                    <input
+                      type={type}
+                      value={form[key]}
+                      onChange={(e) => update(key, e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white"
+                    />
+                  </div>
+                )
+              )}
+            </div>
+          )}
+
+          {currentStep === 3 && (
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-4">Voice</h2>
+              <div className="grid grid-cols-2 gap-3">
+                {VOICE_OPTIONS.map((v) => (
+                  <button
+                    key={v.value}
+                    type="button"
+                    onClick={() => update('voice', v.value)}
+                    className={`p-3 rounded-lg border-2 text-left ${
+                      form.voice === v.value
+                        ? 'border-purple-500 bg-purple-500/20 text-white'
+                        : 'border-white/20 text-gray-200'
+                    }`}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 4 && (
+            <div className="text-center text-white">
+              <h2 className="text-2xl font-bold mb-4">Create your demo agent</h2>
+              <p className="text-gray-300 mb-6">
+                We’ll create a preview voice agent in Vapi (no phone number). You can test it from your dashboard.
+              </p>
+              <ul className="text-left text-gray-300 text-sm space-y-1 max-w-md mx-auto mb-6">
+                <li>Template: {TEMPLATES.find((t) => t.id === form.templateId)?.label}</li>
+                <li>Business: {form.businessName}</li>
+                <li>Agent: {form.agentName}</li>
+              </ul>
+            </div>
+          )}
         </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center mt-8">
+        <div className="flex justify-between mt-8">
           <button
-            onClick={prevStep}
+            type="button"
+            onClick={prev}
             disabled={currentStep === 1}
-            className="px-6 py-3 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 border border-white/30 text-white rounded-lg disabled:opacity-40"
           >
-            Previous
+            Back
           </button>
-
           {currentStep < totalSteps ? (
             <button
-              onClick={nextStep}
-              disabled={!canProceed()}
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:bg-gray-600 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg disabled:cursor-not-allowed"
+              type="button"
+              disabled={!canNext()}
+              onClick={next}
+              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg disabled:opacity-40"
             >
               Next
             </button>
           ) : (
             <button
-              onClick={handleComplete}
-              disabled={!canProceed() || loading}
-              className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:bg-gray-600 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg disabled:cursor-not-allowed"
+              type="button"
+              disabled={loading}
+              onClick={handleCreate}
+              className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg disabled:opacity-40"
             >
-              {loading ? (
-                <div className="flex items-center">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                  Creating Assistant...
-                </div>
-              ) : (
-                'Create Assistant'
-              )}
+              {loading ? 'Creating…' : 'Create demo agent'}
             </button>
           )}
         </div>
       </div>
     </div>
   );
-};
-
-export default OnboardingFlow;
+}

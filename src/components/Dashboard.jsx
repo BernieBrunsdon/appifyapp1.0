@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { api } from '../utils/api';
 
 const Dashboard = () => {
   const { userData } = useAuth();
@@ -12,86 +13,70 @@ const Dashboard = () => {
   });
   const [recentCalls, setRecentCalls] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [buildMsg, setBuildMsg] = useState('');
+  const [stage, setStage] = useState('');
 
   useEffect(() => {
     const loadDashboardData = async () => {
-      if (!userData?.agent?.vapiAssistantId) {
+      const assistantId = userData?.agent?.vapiAssistantId;
+      if (!assistantId) {
         setLoading(false);
         return;
       }
-
-
-      // Load real stats from Vapi API directly
-      const loadRealStats = async (assistantId) => {
-        try {
-          
-          // Get calls from Vapi API directly
-          const callsResponse = await fetch(`https://api.vapi.ai/call?assistantId=${assistantId}`, {
-            headers: {
-              'Authorization': `Bearer ${process.env.REACT_APP_VAPI_API_KEY}`
-            }
-          });
-          
-          if (callsResponse.ok) {
-            const callsData = await callsResponse.json();
-            
-            // Vapi API might return calls directly or in a 'calls' property
-            const allCalls = callsData.calls || callsData || [];
-            
-            // Filter calls for this specific assistant
-            const calls = allCalls.filter(call => {
-              return call.assistantId === assistantId || call.assistant?.id === assistantId;
-            });
-            
-            
-            // Calculate real stats from calls
-            const totalCalls = calls.length;
-            const successfulCalls = calls.filter(call => call.status === 'ended' && call.endedReason === 'assistant-ended-conversation').length;
-            const successRate = totalCalls > 0 ? Math.round((successfulCalls / totalCalls) * 100) : 0;
-            const avgDuration = totalCalls > 0 ? Math.round(calls.reduce((sum, call) => sum + (call.duration || 0), 0) / totalCalls / 60) : 0;
-            
-            // Get today's calls
-            const today = new Date().toISOString().split('T')[0];
-            const todayCalls = calls.filter(call => call.createdAt && call.createdAt.startsWith(today)).length;
-            
-            const statsData = {
-              totalCalls,
-              activeCalls: calls.filter(call => call.status === 'in-progress').length,
-              successRate,
-              avgDuration,
-              todayCalls
-            };
-            
-            setStats(statsData);
-            
-            // Process calls for display
-            const processedCalls = calls.map(call => ({
-              id: call.id,
-              phoneNumber: call.customer?.number || call.customerPhoneNumber || 'Web Call',
-              duration: call.duration || 0,
-              status: call.status,
-              createdAt: call.createdAt,
-              endedReason: call.endedReason,
-              cost: call.cost || 0
-            }));
-            
-            setRecentCalls(processedCalls);
-          } else {
-            console.error('❌ Failed to load call logs from Vapi:', callsResponse.status);
-            const errorText = await callsResponse.text();
-            console.error('❌ Error details:', errorText);
-          }
-        } catch (error) {
-          console.error('❌ Error loading real stats:', error);
-        }
-      };
-
-      await loadRealStats(userData.agent.vapiAssistantId);
-      setLoading(false);
+      try {
+        const data = await api('/api/onboarding/calls');
+        const calls = data.calls || [];
+        const totalCalls = calls.length;
+        const successfulCalls = calls.filter(
+          (c) => c.status === 'ended' && c.endedReason === 'assistant-ended-conversation'
+        ).length;
+        const successRate = totalCalls ? Math.round((successfulCalls / totalCalls) * 100) : 0;
+        const avgDuration = totalCalls
+          ? Math.round(calls.reduce((s, c) => s + (c.duration || 0), 0) / totalCalls / 60)
+          : 0;
+        const today = new Date().toISOString().split('T')[0];
+        const todayCalls = calls.filter((c) => c.createdAt && String(c.createdAt).startsWith(today)).length;
+        setStats({
+          totalCalls,
+          activeCalls: calls.filter((c) => c.status === 'in-progress').length,
+          successRate,
+          avgDuration,
+          todayCalls
+        });
+        setRecentCalls(
+          calls.map((call) => ({
+            id: call.id,
+            phoneNumber: call.customer?.number || call.customerPhoneNumber || 'Web Call',
+            duration: call.duration || 0,
+            status: call.status,
+            createdAt: call.createdAt,
+            endedReason: call.endedReason,
+            cost: call.cost || 0
+          }))
+        );
+        const me = await api('/api/onboarding/me');
+        setStage(me.onboardingStage || '');
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
     };
-
     loadDashboardData();
   }, [userData]);
+
+  const submitBuild = async () => {
+    try {
+      const r = await api('/api/onboarding/build-request', {
+        method: 'POST',
+        body: JSON.stringify({ notes: '' })
+      });
+      setBuildMsg(r.message || 'Submitted.');
+      setStage('build_requested');
+    } catch (e) {
+      setBuildMsg(e.message || 'Failed');
+    }
+  };
 
   // Helper functions
 
@@ -153,8 +138,28 @@ const Dashboard = () => {
             </span>
           </h1>
           <p className="text-gray-200">
-            Monitor your AI assistant's performance in real-time.
+            Demo agent — test below. Production setup is manual after you request a build.
           </p>
+          {stage && stage !== 'build_requested' && (
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={submitBuild}
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-semibold text-white"
+              >
+                Build Agent
+              </button>
+              <p className="text-gray-400 text-sm mt-2">
+                We’ll contact you to finalize phone numbers, routing, and integrations.
+              </p>
+            </div>
+          )}
+          {stage === 'build_requested' && (
+            <p className="mt-4 text-green-400 text-sm">
+              Build request submitted. An Appify consultant will contact you shortly.
+            </p>
+          )}
+          {buildMsg && <p className="text-cyan-300 text-sm mt-2">{buildMsg}</p>}
           {userData?.agent && (
             <div className="mt-4 text-sm text-gray-400">
               <span className="mr-4">Voice: {userData.agent.agentVoice}</span>

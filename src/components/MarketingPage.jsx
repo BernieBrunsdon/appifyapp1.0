@@ -88,7 +88,7 @@ const tiers = [
   },
   {
     name: 'Premium / Enterprise',
-    price: '$999+/mo',
+    price: '$822/mo',
     setupCost: '$499',
     features: [
       'Everything in Pro, plus:',
@@ -105,7 +105,7 @@ const tiers = [
     ],
     idealFor: 'Enterprises, call-heavy businesses, franchises, SaaS companies',
     setupTime: '2-5 business days',
-    paypalAmount: '999.00',
+    paypalAmount: '822.00',
     paypalItem: 'AppifyAI Premium Plan',
   },
 ];
@@ -127,9 +127,20 @@ export default function MarketingPage() {
   ]);
   const [chatInput, setChatInput] = useState('');
   const [showDemoModal, setShowDemoModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
 
   const vapiRef = useRef(null);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
 
   // Initialize Vapi SDK
   useEffect(() => {
@@ -407,11 +418,11 @@ export default function MarketingPage() {
         <div className="relative z-10">
         {/* Navigation Bar */}
         <header className="absolute top-0 left-0 right-0 z-20 flex justify-between items-center py-6 px-4 md:px-8">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-shrink-0">
             <img 
               src="/screenshots/appymascot.png.png" 
               alt="Appy - The Appify AI Mascot" 
-              className="w-12 h-12 object-contain"
+              className="w-10 h-10 md:w-12 md:h-12 object-contain"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextSibling.style.display = 'block';
@@ -420,17 +431,46 @@ export default function MarketingPage() {
             <div className="hidden w-12 h-12 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
               Appy
             </div>
-            <span className="text-2xl font-bold text-white">Appify.AI</span>
+            <span className="text-xl md:text-2xl font-bold text-white">Appify.AI</span>
           </div>
-          <nav className="flex items-center space-x-6">
+          {/* Desktop nav - hidden on mobile */}
+          <nav className="hidden md:flex items-center space-x-6">
             <a href="#features" className="text-gray-300 hover:text-white transition">Features</a>
             <a href="#pricing" className="text-gray-300 hover:text-white transition">Pricing</a>
             <a href="#contact" className="text-gray-300 hover:text-white transition">Contact</a>
-            <a href={getAppUrl("/register")} className="px-6 py-2 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 rounded-lg text-white hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 transition font-semibold shadow-lg">
-              Get Started
+            <a href={getAppUrl('/register')} className="px-6 py-2 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 rounded-lg text-white hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 transition font-semibold shadow-lg">
+              Create demo
             </a>
           </nav>
+          {/* Mobile hamburger button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition"
+            aria-label="Toggle menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </header>
+        {/* Mobile menu dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden fixed inset-0 z-10 pt-20 px-4 bg-gray-900/95 backdrop-blur-sm">
+            <nav className="flex flex-col space-y-4">
+              <a href="#features" className="text-gray-300 hover:text-white text-lg py-2 transition" onClick={() => setMobileMenuOpen(false)}>Features</a>
+              <a href="#pricing" className="text-gray-300 hover:text-white text-lg py-2 transition" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
+              <a href="#contact" className="text-gray-300 hover:text-white text-lg py-2 transition" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+              <a href={getAppUrl('/register')} className="mt-4 inline-block px-6 py-3 text-center bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 rounded-lg text-white font-semibold hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 transition" onClick={() => setMobileMenuOpen(false)}>
+                Create demo
+              </a>
+            </nav>
+          </div>
+        )}
 
         {/* Hero Section */}
         <main className="pt-48 pb-16 md:pt-56 md:pb-24 text-center px-4">
@@ -444,7 +484,7 @@ export default function MarketingPage() {
             We build custom voice AI agents to answer calls, book appointments, and qualify leads, so you can focus on growing your business.
           </p>
           <div className="mt-12 flex flex-col sm:flex-row justify-center items-center gap-6">
-            <a href="https://app.appifyai.com/register" className="w-full sm:w-auto px-10 py-5 text-lg font-semibold text-white rounded-lg bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 transition transform hover:scale-105 shadow-lg">Start Free Trial</a>
+            <a href={getAppUrl('/register')} className="w-full sm:w-auto px-10 py-5 text-lg font-semibold text-white rounded-lg bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 transition transform hover:scale-105 shadow-lg text-center">Create Your AI Voice Agent Demo</a>
             <button onClick={() => setShowDemoModal(true)} className="w-full sm:w-auto px-10 py-5 text-lg font-semibold text-white rounded-lg border-2 border-white/30 hover:bg-white/10 transition transform hover:scale-105">Book A Demo</button>
           </div>
           <div className="mt-8 flex justify-center items-center space-x-2 text-gray-300 text-base">
@@ -882,9 +922,9 @@ export default function MarketingPage() {
                 Join thousands of businesses already using Appify.AI to automate their operations and grow their revenue.
               </p>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href="https://app.appifyai.com/register" className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition transform hover:scale-105">
-                  Start Free Trial
-                </a>
+                <button onClick={() => setShowDemoModal(true)} className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition transform hover:scale-105">
+                  Book Demo
+                </button>
                 <button onClick={() => setShowDemoModal(true)} className="px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition">
                   Book Demo
                 </button>
@@ -893,7 +933,7 @@ export default function MarketingPage() {
           </div>
         </section>
 
-        {/* Integrations Section */}
+        {/* Integrations Section — logos via Simple Icons CDN (Clearbit/Wikipedia hotlinks often break) */}
         <section className="py-16 md:py-20 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
@@ -904,173 +944,52 @@ export default function MarketingPage() {
                 Integrate with more than 40+ apps in a snap
               </p>
             </div>
-            
-            {/* Integrations Carousel */}
+
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-800/30 via-gray-700/20 to-gray-800/30 border border-cyan-500/20 p-8">
-              {/* Gradient overlays for smooth scroll effect */}
-              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-900/40 to-transparent z-10"></div>
-              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-900/40 to-transparent z-10"></div>
-              
-              {/* Scrolling integrations grid */}
+              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-900/40 to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-900/40 to-transparent z-10 pointer-events-none" />
+
               <div className="flex animate-scroll space-x-8">
-                {/* First set of integrations */}
-                <div className="flex space-x-12 flex-shrink-0">
-                  {/* Vapi */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/vapi.ai" alt="Vapi" className="w-16 h-16 object-contain" />
+                {[0, 1].map((loop) => (
+                  <div key={loop} className="flex space-x-12 flex-shrink-0 items-center">
+                    {[
+                      { name: 'OpenAI', src: 'https://cdn.simpleicons.org/openai/412991', light: true },
+                      { name: 'Google Calendar', src: 'https://cdn.simpleicons.org/googlecalendar/4285F4' },
+                      { name: 'HubSpot', src: 'https://cdn.simpleicons.org/hubspot/ff7a59' },
+                      { name: 'Salesforce', src: 'https://cdn.simpleicons.org/salesforce/00a1e0' },
+                      { name: 'Zoom', src: 'https://cdn.simpleicons.org/zoom/2d8cff' },
+                      { name: 'Notion', src: 'https://cdn.simpleicons.org/notion/000000', light: true },
+                      { name: 'Zapier', src: 'https://cdn.simpleicons.org/zapier/ff4a00' },
+                      { name: 'Microsoft Azure', src: 'https://cdn.simpleicons.org/microsoftazure/0078d4' },
+                      { name: 'AWS', src: 'https://cdn.simpleicons.org/amazonaws/ff9900' },
+                      { name: 'Google Cloud', src: 'https://cdn.simpleicons.org/googlecloud/4285F4' },
+                    ].map(({ name, src, light }) => (
+                      <div
+                        key={`${loop}-${name}`}
+                        className="flex flex-col items-center justify-center min-w-[88px] gap-2 hover:scale-110 transition-transform duration-300"
+                      >
+                        <div
+                          className={`w-16 h-16 rounded-xl flex items-center justify-center p-2 ${
+                            light ? 'bg-white/95' : 'bg-white/10'
+                          }`}
+                        >
+                          <img
+                            src={src}
+                            alt=""
+                            width={48}
+                            height={48}
+                            className="w-12 h-12 object-contain"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
+                        <span className="text-xs text-gray-400 text-center leading-tight max-w-[88px]">{name}</span>
+                      </div>
+                    ))}
                   </div>
-                  
-                  {/* OpenAI */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/openai.com" alt="OpenAI" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Google Calendar */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Calendar_icon_%282020%29.svg/64px-Google_Calendar_icon_%282020%29.svg.png" alt="Google Calendar" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* HubSpot */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/hubspot.com" alt="HubSpot" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Salesforce */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/64px-Salesforce.com_logo.svg.png" alt="Salesforce" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Zoom */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/64px-Zoom_Communications_Logo.svg.png" alt="Zoom" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Notion */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Notion_app_logo.png/64px-Notion_app_logo.png" alt="Notion" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Zapier */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/zapier.com" alt="Zapier" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Microsoft Azure */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Microsoft_Azure.svg/64px-Microsoft_Azure.svg.png" alt="Microsoft Azure" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* AWS */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/64px-Amazon_Web_Services_Logo.svg.png" alt="AWS" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Google Cloud */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/cloud.google.com" alt="Google Cloud" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Slack */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Stripe */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/stripe.com" alt="Stripe" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Twilio */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/twilio.com" alt="Twilio" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* WhatsApp */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/whatsapp.com" alt="WhatsApp" className="w-16 h-16 object-contain" />
-                  </div>
-                </div>
-                
-                {/* Second set of integrations (duplicate for seamless loop) */}
-                <div className="flex space-x-12 flex-shrink-0">
-                  {/* Vapi */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/vapi.ai" alt="Vapi" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* OpenAI */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/openai.com" alt="OpenAI" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Google Calendar */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Calendar_icon_%282020%29.svg/64px-Google_Calendar_icon_%282020%29.svg.png" alt="Google Calendar" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* HubSpot */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/hubspot.com" alt="HubSpot" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Salesforce */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/64px-Salesforce.com_logo.svg.png" alt="Salesforce" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Zoom */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/64px-Zoom_Communications_Logo.svg.png" alt="Zoom" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Notion */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Notion_app_logo.png/64px-Notion_app_logo.png" alt="Notion" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Zapier */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/zapier.com" alt="Zapier" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Microsoft Azure */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Microsoft_Azure.svg/64px-Microsoft_Azure.svg.png" alt="Microsoft Azure" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* AWS */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/64px-Amazon_Web_Services_Logo.svg.png" alt="AWS" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Google Cloud */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/cloud.google.com" alt="Google Cloud" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Slack */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Stripe */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/stripe.com" alt="Stripe" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* Twilio */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/twilio.com" alt="Twilio" className="w-16 h-16 object-contain" />
-                  </div>
-                  
-                  {/* WhatsApp */}
-                  <div className="flex items-center justify-center min-w-[80px] h-20 hover:scale-110 transition-all duration-300">
-                    <img src="https://logo.clearbit.com/whatsapp.com" alt="WhatsApp" className="w-16 h-16 object-contain" />
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
-            
           </div>
         </section>
 
@@ -1242,7 +1161,7 @@ export default function MarketingPage() {
               />
               <FAQItem 
                 question="How much does your platform cost?"
-                answer="Our pricing starts at $249/month for the Basic plan, $499/month for Pro, and $999+/month for Premium/Enterprise. All plans include setup costs and come with included minutes."
+                answer="Our pricing starts at $249/month for the Basic plan, $499/month for Pro, and $822/month for Premium/Enterprise. All plans include setup costs and come with included minutes."
               />
               <FAQItem 
                 question="Is my data secure on your platform?"
@@ -1289,12 +1208,12 @@ export default function MarketingPage() {
                   </p>
                   <p className="text-gray-400 text-sm mt-1">{tier.idealFor}</p>
                 </div>
-                <a 
-                  href={`${getAppUrl("/register")}?plan=${tier.name.toLowerCase().replace(' plan', '').replace(' ', '_')}`}
+                <button 
+                  onClick={() => setShowDemoModal(true)}
                   className="mt-8 w-full block text-center px-6 py-3 font-semibold text-white rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition"
                 >
-                  {tier.name === 'Free Plan' ? 'Start Free' : 'Get Started'}
-                </a>
+                  Contact Us
+                </button>
               </div>
             ))}
           </div>

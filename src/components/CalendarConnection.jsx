@@ -14,12 +14,17 @@ export default function CalendarConnection({ onConnected, onCancel }) {
 
   const initializeCalendar = async () => {
     setLoading(true);
+    setError('');
     try {
+      if (calendarService.credentialsMissing) {
+        setError('Google Calendar is not configured. Add REACT_APP_GOOGLE_CLIENT_ID and REACT_APP_GOOGLE_API_KEY to your .env (see docs/GOOGLE_CALENDAR_OAUTH_SETUP.md).');
+        return;
+      }
       const initialized = await calendarService.initialize();
       if (initialized && calendarService.isUserSignedIn()) {
         await loadUserData();
       }
-    } catch (error) {
+    } catch (err) {
       setError('Failed to initialize calendar service');
     } finally {
       setLoading(false);
@@ -46,6 +51,10 @@ export default function CalendarConnection({ onConnected, onCancel }) {
   };
 
   const handleSignIn = async () => {
+    if (calendarService.credentialsMissing) {
+      setError('Google Calendar is not configured. Add REACT_APP_GOOGLE_CLIENT_ID and REACT_APP_GOOGLE_API_KEY to your .env.');
+      return;
+    }
     setLoading(true);
     setError('');
 

@@ -4,15 +4,18 @@ class CalendarService {
     this.gapi = null;
     this.isInitialized = false;
     this.isSignedIn = false;
-    this.clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || 'your-google-client-id';
-    this.apiKey = process.env.REACT_APP_GOOGLE_API_KEY || 'your-google-api-key';
+    this.clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
+    this.apiKey = process.env.REACT_APP_GOOGLE_API_KEY || '';
+    this.credentialsMissing =
+      !this.clientId || !this.apiKey || this.clientId === 'your-google-client-id' || this.apiKey === 'your-google-api-key';
     this.discoveryDoc = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
     this.scopes = 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.events';
   }
 
   // Initialize Google API
   async initialize() {
-    if (this.isInitialized) return;
+    if (this.isInitialized) return true;
+    if (this.credentialsMissing) return false;
 
     try {
       // Load Google API script

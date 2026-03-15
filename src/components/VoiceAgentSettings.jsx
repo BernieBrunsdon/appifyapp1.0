@@ -1,10 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import OnboardingModal from './OnboardingModal';
+import { api } from '../utils/api';
 
-const API_URL = 'https://api.vapi.ai/assistant';
-const REST_API_KEY = process.env.REACT_APP_VAPI_API_KEY;
-const PUBLIC_KEY = '1982777e-4159-4b67-981d-4a99ae5faf31';
+const PUBLIC_KEY = process.env.REACT_APP_VAPI_PUBLIC_KEY || '1982777e-4159-4b67-981d-4a99ae5faf31';
 
+// Vapi assistant IDs are UUIDs. Reject mock IDs (mock_vapi_...) and internal ids (agent_...).
+const VAPI_UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function isValidVapiAssistantId(id) {
+  return typeof id === 'string' && id.length > 0 && VAPI_UUID_REGEX.test(id) && !id.startsWith('mock_');
+}
 
 export default function VoiceAgentSettings({ showToast }) {
   const [loading, setLoading] = useState(true);
@@ -15,35 +19,34 @@ export default function VoiceAgentSettings({ showToast }) {
   const [vapiLoaded, setVapiLoaded] = useState(false);
   const [agentData, setAgentData] = useState(null);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState(null); // 'ok' | 'mock' | 'missing' | null (unknown)
   
   const vapiRef = useRef(null);
 
-  // Get agent ID from localStorage
-  const getAgentId = () => {
+  // Get Vapi assistant ID only (never internal agent.id). Used for starting calls.
+  const getVapiAssistantId = () => {
     const storedAgentData = localStorage.getItem('agentData');
     const storedUser = localStorage.getItem('user');
-    
+    let vapiId = null;
     if (storedAgentData) {
       try {
-        const agentData = JSON.parse(storedAgentData);
-        return agentData.vapiAssistantId || agentData.id;
+        const data = JSON.parse(storedAgentData);
+        vapiId = data.vapiAssistantId || data.demo_assistant_id || null;
       } catch (err) {
         console.error('Error parsing stored agent data:', err);
       }
     }
-    
-    if (storedUser) {
+    if (!vapiId && storedUser) {
       try {
         const user = JSON.parse(storedUser);
-        if (user.agent && user.agent.vapiAssistantId) {
-          return user.agent.vapiAssistantId;
+        if (user.agent) {
+          vapiId = user.agent.vapiAssistantId || user.agent.demo_assistant_id || null;
         }
       } catch (err) {
         console.error('Error parsing stored user data:', err);
       }
     }
-    
-    return null;
+    return vapiId;
   };
 
   // Load agent data
@@ -71,11 +74,11 @@ export default function VoiceAgentSettings({ showToast }) {
             greeting: agent.firstMessage || '',
             voice: agent.agentVoice || 'alloy'
           });
-          
-          // Load agent details from Vapi if we have an ID
-          if (agent.vapiAssistantId) {
-            await loadAgentFromVapi(agent.vapiAssistantId);
-          }
+          const vapiId = agent.vapiAssistantId || agent.demo_assistant_id;
+          setConnectionStatus(
+            !vapiId ? 'missing' : isValidVapiAssistantId(vapiId) ? 'ok' : 'mock'
+          );
+          if (vapiId && isValidVapiAssistantId(vapiId)) await loadAgentFromVapi();
         }
       } catch (error) {
         console.error('Error loading agent data:', error);
@@ -88,25 +91,18 @@ export default function VoiceAgentSettings({ showToast }) {
     loadAgentData();
   }, []);
 
-  // Load agent from Vapi API
-  const loadAgentFromVapi = async (agentId) => {
+  const loadAgentFromVapi = async () => {
     try {
-      const response = await fetch(`${API_URL}/${agentId}`, {
-        headers: { Authorization: `Bearer ${REST_API_KEY}` }
-      });
-      
-      if (response.ok) {
-        const agent = await response.json();
-        setForm({
-          name: agent.name || '',
-          greeting: agent.firstMessage || '',
-          voice: agent.voice || 'alloy'
-        });
-      } else {
-        console.warn('Failed to load agent from Vapi:', response.status);
+      const me = await api('/api/onboarding/me');
+      if (me.agentName || me.configuration_json) {
+        setForm((f) => ({
+          ...f,
+          name: me.agentName || me.configuration_json?.agentName || f.name,
+          greeting: f.greeting
+        }));
       }
-    } catch (error) {
-      console.error('Error loading agent from Vapi:', error);
+    } catch {
+      /* offline */
     }
   };
 
@@ -127,6 +123,20 @@ export default function VoiceAgentSettings({ showToast }) {
           showToast('Call ended');
         });
         
+        vapiRef.current.on('error', (err) => {
+          console.error('Vapi error event:', err);
+          setCallStatus('idle');
+          const msg = err?.message || err?.error || (typeof err === 'string' ? err : 'Voice error');
+          showToast(msg || 'Failed to start call. Please try again.');
+        });
+        
+        vapiRef.current.on('call-start-failed', (event) => {
+          console.error('Vapi call-start-failed:', event);
+          setCallStatus('idle');
+          const msg = event?.error || event?.stage || 'Call failed to start';
+          showToast(msg || 'Failed to start call. Please try again.');
+        });
+        
         setVapiLoaded(true);
         console.log('✅ Vapi initialized successfully');
       } catch (error) {
@@ -138,26 +148,29 @@ export default function VoiceAgentSettings({ showToast }) {
     initVapi();
   }, [showToast]);
 
-  // Start call
+  // Start call (only with valid Vapi assistant UUID)
   const startCall = async () => {
+    const assistantId = getVapiAssistantId();
+    if (!assistantId) {
+      showToast('No assistant configured. Please set up your assistant first.');
+      return;
+    }
+    if (!isValidVapiAssistantId(assistantId)) {
+      showToast('Demo agent is not ready yet. Please refresh the page or try again in a moment.');
+      return;
+    }
+    if (!vapiRef.current) {
+      showToast('Voice system not ready. Please try again.');
+      return;
+    }
     try {
-      const agentId = getAgentId();
-      if (!agentId) {
-        showToast('No assistant configured. Please set up your assistant first.');
-        return;
-      }
-      
-      if (!vapiRef.current) {
-        showToast('Voice system not ready. Please try again.');
-        return;
-      }
-      
       setCallStatus('starting');
-      await vapiRef.current.start(agentId);
+      await vapiRef.current.start(assistantId);
     } catch (error) {
       console.error('Error starting call:', error);
       setCallStatus('idle');
-      showToast('Failed to start call. Please try again.');
+      const msg = error?.message || error?.error || (error?.response?.data?.message || 'Failed to start call. Please try again.');
+      showToast(typeof msg === 'string' ? msg : 'Failed to start call. Please try again.');
     }
   };
 
@@ -167,32 +180,22 @@ export default function VoiceAgentSettings({ showToast }) {
       setSaving(true);
       setError('');
       
-      const agentId = getAgentId();
-      if (!agentId) {
-        setError('No assistant configured');
+      const assistantId = getVapiAssistantId();
+      if (!assistantId || !isValidVapiAssistantId(assistantId)) {
+        setError('No valid demo assistant configured');
         return;
       }
       
-      // Update agent in Vapi
-      const response = await fetch(`${API_URL}/${agentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${REST_API_KEY}`
-        },
+      await api('/api/onboarding/demo-assistant', {
+        method: 'PATCH',
         body: JSON.stringify({
-          name: form.name,
+          agentName: form.name,
           firstMessage: form.greeting,
           voice: form.voice
         })
       });
-      
-      if (response.ok) {
-        showToast('Settings saved successfully!');
-        await loadAgentFromVapi(agentId);
-      } else {
-        throw new Error('Failed to save settings');
-      }
+      showToast('Settings saved successfully!');
+      await loadAgentFromVapi();
     } catch (error) {
       console.error('Error saving settings:', error);
       setError('Failed to save settings');
@@ -254,9 +257,14 @@ export default function VoiceAgentSettings({ showToast }) {
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className={`w-3 h-3 rounded-full ${vapiLoaded ? 'bg-green-400' : 'bg-red-400'}`}></div>
+              <div className={`w-3 h-3 rounded-full ${
+                connectionStatus === 'ok' && vapiLoaded ? 'bg-green-400' :
+                connectionStatus === 'mock' ? 'bg-amber-400' : 'bg-red-400'
+              }`}></div>
               <span className="text-sm text-gray-300">
-                {vapiLoaded ? 'Voice Ready' : 'Voice Loading...'}
+                {!vapiLoaded ? 'Voice Loading...' :
+                 connectionStatus === 'ok' ? 'Demo agent ready' :
+                 connectionStatus === 'mock' ? 'Demo not ready (retry or contact support)' : 'Voice Ready'}
               </span>
             </div>
             <button 
@@ -286,9 +294,9 @@ export default function VoiceAgentSettings({ showToast }) {
                 {/* Main button - dark blue inner disc */}
                 <button
                   onClick={startCall}
-                  disabled={callStatus !== 'idle' || !vapiLoaded}
+                  disabled={callStatus !== 'idle' || !vapiLoaded || connectionStatus !== 'ok'}
                   className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all transform hover:scale-105 shadow-2xl ${
-                    callStatus === 'idle' && vapiLoaded
+                    callStatus === 'idle' && vapiLoaded && connectionStatus === 'ok'
                       ? 'bg-gradient-to-br from-blue-800 to-blue-900 hover:from-blue-700 hover:to-blue-800 hover:shadow-purple-500/50'
                       : 'bg-gray-600 cursor-not-allowed'
                   }`}
@@ -320,7 +328,9 @@ export default function VoiceAgentSettings({ showToast }) {
                  callStatus === 'active' ? 'Call in progress...' : 'Ready to call'}
               </p>
               <p className="text-gray-400 text-sm">
-                {vapiLoaded ? 'Voice system ready' : 'Initializing voice system...'}
+                {!vapiLoaded ? 'Initializing voice system...' :
+                 connectionStatus === 'ok' ? 'Click the mic to test your demo agent' :
+                 connectionStatus === 'mock' ? 'Demo agent could not be created; refresh or contact support' : 'Voice system ready'}
               </p>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { signOutUser } from '../firebase/auth';
+import BackToMarketing from './BackToMarketing';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -32,15 +33,6 @@ const Sidebar = () => {
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-        </svg>
-      )
-    },
-    {
-      name: 'WhatsApp',
-      href: '/whatsapp',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
       )
     },
@@ -86,8 +78,13 @@ const Sidebar = () => {
         ))}
       </nav>
 
+      {/* Marketing site */}
+      <div className="px-4 py-3 border-t border-white/20">
+        <BackToMarketing className="px-4 py-2 rounded-lg hover:bg-white/10 w-full justify-center text-gray-300 hover:text-cyan-200" />
+      </div>
+
       {/* Logout Button */}
-      <div className="p-4 border-t border-white/20">
+      <div className="p-4 border-t border-white/20 pt-0">
         <button
           onClick={handleLogout}
           className="flex items-center w-full px-4 py-2 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-lg transition-all duration-300"

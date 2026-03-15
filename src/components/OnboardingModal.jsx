@@ -39,7 +39,7 @@ const OnboardingModal = ({ isOpen, onClose, onComplete, clientData }) => {
         agentName: 'Appy',
         agentVoice: 'alloy',
         firstMessage: 'Hello! I\'m Appy, your AI assistant. How can I help you today?',
-        systemPrompt: 'You are Appy, the official AI assistant for AppifyAI - a cutting-edge AI communication platform that helps businesses automate their customer interactions through intelligent voice assistants, WhatsApp integration, and multi-channel AI receptionists.'
+        systemPrompt: 'You are Appy, the official AI assistant for AppifyAI - a platform that helps businesses deploy AI voice agents.'
       });
     }
   }, [isOpen]);

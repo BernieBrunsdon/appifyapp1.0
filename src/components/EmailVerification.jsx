@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { resendEmailVerification, checkEmailVerification, signOutUser } from '../firebase/auth';
+import BackToMarketing from './BackToMarketing';
 
 export default function EmailVerification({ userEmail, onVerified }) {
   const [loading, setLoading] = useState(false);
@@ -82,6 +83,10 @@ export default function EmailVerification({ userEmail, onVerified }) {
         backgroundSize: '40px 40px',
         backgroundPosition: 'center center'
       }}></div>
+
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+        <BackToMarketing className="px-3 py-2 rounded-lg bg-black/30 backdrop-blur-sm border border-white/10 hover:bg-white/10" />
+      </div>
 
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
         <div className="w-full max-w-md">

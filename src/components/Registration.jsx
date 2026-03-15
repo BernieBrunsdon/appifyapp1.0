@@ -5,6 +5,7 @@ import OnboardingModal from './OnboardingModal';
 import LoginModal from './LoginModal';
 import { registerUser } from '../firebase/auth';
 import { FirebaseService } from '../services/firebaseService';
+import BackToMarketing from './BackToMarketing';
 
 export default function Registration({ onRegister, selectedPlan }) {
   // Map URL plan parameter to form plan
@@ -17,7 +18,7 @@ export default function Registration({ onRegister, selectedPlan }) {
       'premium': 'enterprise',
       'enterprise': 'enterprise'
     };
-    return planMap[planParam] || 'free';
+    return 'free';
   };
 
   const [form, setForm] = useState({
@@ -38,71 +39,24 @@ export default function Registration({ onRegister, selectedPlan }) {
   const [showLoginModal, setShowLoginModal] = useState(false); // Login modal state
   const [showOnboardingModal, setShowOnboardingModal] = useState(false); // Onboarding modal state
   const [clientData, setClientData] = useState(null); // Client data for onboarding
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const plans = [
     {
       id: 'free',
-      name: 'Free Plan',
+      name: 'Demo & build request',
       price: 'Free',
       period: '',
       features: [
-        'Intelligent AI human-like call answering',
-        'Full access to APPY (Appify App)',
-        'Basic customization (Accent control, personality, basic FAQ)',
-        'Basic call routing (Transfer to one number)',
-        'Business hours configuration',
-        'Fully custom jewelry inventory and business details',
-        'Knowledge base',
-        '1 business phone number (or bring your own)',
-        'Call filtering to divert unwanted calls to email',
-        '100 minutes included',
-        'Overage: $0.25/minute'
+        'Create a demo voice agent',
+        'Test in your dashboard',
+        'Request production setup (consultant contact)',
+        'No payment in Phase 1'
       ],
       paypalAmount: '0.00',
-      paypalItem: 'AppifyAI Free Plan'
-    },
-    {
-      id: 'pro',
-      name: 'Pro Plan',
-      price: '$499/mo',
-      period: '',
-      features: [
-        'Everything in Basic, plus:',
-        'Advanced call routing (multiple numbers, ring groups, departments)',
-        'Automated email + SMS follow-ups',
-        'CRM integrations (HubSpot, Salesforce, Zoho)',
-        'Appointment booking automation (Google/Outlook sync)',
-        'Priority setup (1-2 business days)',
-        'Expanded knowledge base (industry-specific FAQs)',
-        'Call analytics dashboard',
-        '3 business numbers included (or BYO)',
-        '1,500 minutes included',
-        'Overage: $0.20/minute'
-      ],
-      paypalAmount: '499.00',
-      paypalItem: 'AppifyAI Pro Plan'
-    },
-    {
-      id: 'enterprise',
-      name: 'Premium / Enterprise',
-      price: '$1/mo',
-      period: ' (Test Mode)',
-      features: [
-        'Everything in Pro, plus:',
-        'Full multi-channel AI receptionist (voice, SMS, email, web chat)',
-        'Custom AI workflows (lead qualification, sales scripts, order taking)',
-        'Deep integrations (Slack, Teams, custom CRMs, Zapier)',
-        'Dedicated account manager + premium support',
-        'Call recording + AI-powered summaries',
-        'Role-based access for teams',
-        'API access for custom automation',
-        '10 business numbers included (local or toll-free)',
-        '5,000 minutes included',
-        'Overage: $0.15/minute'
-      ],
-      paypalAmount: '1.00',
-      paypalItem: 'AppifyAI Premium Plan (Test Mode)'
+      paypalItem: 'AppifyAI Demo'
     }
   ];
 
@@ -198,13 +152,7 @@ export default function Registration({ onRegister, selectedPlan }) {
         // Store user data in localStorage
         localStorage.setItem('user', JSON.stringify(clientData));
         
-        // For free plan, skip payment and go directly to success
-        if (form.plan === 'free') {
-          // Skip payment and go directly to success
-          handleFreePlanSuccess(clientData);
-        } else {
-          setCurrentStep(2); // Move to payment step
-        }
+        handleFreePlanSuccess(clientData);
       } else {
         setErrors({ general: result.error });
       }
@@ -262,10 +210,7 @@ export default function Registration({ onRegister, selectedPlan }) {
       
       setPaymentSuccess(true);
       setCurrentStep(3);
-      
-      // Show onboarding modal for agent setup
-      setShowOnboardingModal(true);
-      
+      window.location.href = '/onboarding';
     } catch (error) {
       console.error('Free plan setup error:', error);
       setErrors({ general: 'Account setup failed. Please try again.' });
@@ -472,26 +417,64 @@ export default function Registration({ onRegister, selectedPlan }) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      value={form.password}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 pr-10 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(prev => !prev)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-white focus:outline-none"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                   {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Confirm Password</label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={form.confirmPassword}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={form.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 pr-10 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(prev => !prev)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-white focus:outline-none"
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showConfirmPassword ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                   {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
                 </div>
               </div>
@@ -695,7 +678,7 @@ export default function Registration({ onRegister, selectedPlan }) {
           <ul className="text-left text-gray-300 space-y-2">
             <li>• Your AI assistant is being configured</li>
             <li>• Phone number assignment in progress</li>
-            <li>• WhatsApp integration being set up</li>
+            <li>• Voice agent configuration in progress</li>
             <li>• Welcome email sent to {form.email}</li>
           </ul>
               </div>
@@ -712,19 +695,19 @@ export default function Registration({ onRegister, selectedPlan }) {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* New Hero Background Image with High Opacity */}
+      {/* New Hero Background Image with Higher Opacity */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
         style={{
           backgroundImage: 'url(/screenshots/newhero.png)',
-          opacity: 0.15
+          opacity: 0.3
         }}
       ></div>
       
-      {/* Enhanced Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"></div>
-      <div className="absolute inset-0 bg-gradient-to-tr from-pink-900/20 via-purple-900/20 to-blue-900/20"></div>
-      <div className="absolute inset-0 bg-gradient-to-bl from-cyan-900/10 via-transparent to-purple-900/10"></div>
+      {/* Enhanced Gradient Background with Lower Opacity */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-blue-900/80 to-indigo-900/80 z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-pink-900/10 via-purple-900/10 to-blue-900/10 z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-bl from-cyan-900/5 via-transparent to-purple-900/5 z-10"></div>
       
       {/* Enhanced Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -743,7 +726,11 @@ export default function Registration({ onRegister, selectedPlan }) {
         backgroundPosition: 'center center'
       }}></div>
 
-      <div className="relative z-10 w-full min-h-screen py-8 px-4">
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+        <BackToMarketing className="px-3 py-2 rounded-lg bg-black/30 backdrop-blur-sm border border-white/10 hover:bg-white/10" />
+      </div>
+
+      <div className="relative z-20 w-full min-h-screen py-8 px-4">
         {currentStep === 1 && renderFormStep()}
         {currentStep === 2 && renderPaymentStep()}
         {currentStep === 3 && renderSuccessStep()}
